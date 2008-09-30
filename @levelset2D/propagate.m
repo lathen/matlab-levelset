@@ -6,7 +6,7 @@ if(isempty(old_delta_phi))
     old_delta_phi = zeros(size(ls));
 end
 
-alpha = 0;
+alpha = 0.5;
 %virt_m = 0.1;
 lr = 1; % Learning rate
 elapsed = 0;
@@ -67,9 +67,10 @@ else
         % Update level set function and continue
         ls.phi(ls.band) = phi;
         elapsed = elapsed + dt;
-        iterations = iterations + 1
+        iterations = iterations + 1;
     end
 
+    iterations
     ls = rebuild_narrowband(ls);
     
     % Update level set function and exit
