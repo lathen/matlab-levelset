@@ -6,9 +6,9 @@ if(isempty(old_delta_phi))
     old_delta_phi = zeros(size(ls));
 end
 
-alpha = 0.5;
+alpha = 0;
 %virt_m = 0.1;
-lr = 15; % Learning rate
+lr = 1; % Learning rate
 elapsed = 0;
 iterations = 0;
 
@@ -41,8 +41,8 @@ if (time == 0)
     subplot(3,2,1);imagesc(old_phi);colorbar;hold on; plot(ls, 'contour y');
     subplot(3,2,2);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
     subplot(3,2,3);imagesc(old_delta_phi);colorbar;hold on; plot(ls, 'contour y');
-    subplot(3,2,4);imagesc(curr_delta_phi);colorbar;hold on; plot(ls, 'contour y');
-    subplot(3,2,5);imagesc(abs(curr_delta_phi- old_delta_phi));colorbar;hold on; plot(ls, 'contour y');
+    subplot(3,2,4);imagesc(lr*curr_delta_phi);colorbar;hold on; plot(ls, 'contour y');
+    subplot(3,2,5);imagesc(abs(lr*curr_delta_phi- old_delta_phi));colorbar;hold on; plot(ls, 'contour y');
     drawnow;
     %pause;
     
@@ -60,28 +60,34 @@ if (time == 0)
 % Else, iterate until requested time is reached
 else
     while (elapsed < time)
-    
-    % Propagate the level set function in time
-    [phi,dt] = ls.integrate(ls, time-elapsed, operator, varargin{:});
-    new_phi = ls.phi;
-    new_phi(ls.band) = phi;
+
+        % Propagate the level set function in time
+        [phi,dt] = ls.integrate(ls, time-elapsed, operator, varargin{:});
+
+        % Update level set function and continue
+        ls.phi(ls.band) = phi;
+        elapsed = elapsed + dt;
+        iterations = iterations + 1
+    end
+
+    ls = rebuild_narrowband(ls);
     
     % Update level set function and exit
-    est_delta_phi = new_phi - ls.phi;
-    delta_phi     = alpha * old_delta_phi + (1-alpha)*lr*est_delta_phi;
+    curr_delta_phi = ls.phi - old_phi;
+    delta_phi      = alpha * old_delta_phi + (1-alpha)*lr*curr_delta_phi;
+    %delta_phi     = old_delta_phi + curr_delta_phi / virt_m;
+    old_delta_phi = delta_phi;
 
-    ls.phi(ls.band) = ls.phi(ls.band) + delta_phi(ls.band);
+    ls.phi = old_phi + delta_phi;
+    ls = rebuild_narrowband(ls);
     
     figure(43); hold off; clf;
     subplot(3,2,1);imagesc(old_phi);colorbar;hold on; plot(ls, 'contour y');
     subplot(3,2,2);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
     subplot(3,2,3);imagesc(old_delta_phi);colorbar;hold on; plot(ls, 'contour y');
-    subplot(3,2,4);imagesc(delta_phi);colorbar;hold on; plot(ls, 'contour y');
-    subplot(3,2,5);imagesc(abs(delta_phi- old_delta_phi));colorbar;hold on; plot(ls, 'contour y');
+    subplot(3,2,4);imagesc(lr*curr_delta_phi);colorbar;hold on; plot(ls, 'contour y');
+    subplot(3,2,5);imagesc(abs(lr*curr_delta_phi- old_delta_phi));colorbar;hold on; plot(ls, 'contour y');
     drawnow;
     
-        elapsed = elapsed + dt;
-        iterations = iterations + 1;
-    end
 end
 
