@@ -2,23 +2,42 @@
 function [ls,iterations, elapsed] = propagate(ls, time, operator, varargin)
 
 persistent old_delta_phi;
+persistent XI;
+persistent YI;
 if(isempty(old_delta_phi))
     old_delta_phi = zeros(size(ls));
+    nrows = size(old_delta_phi,1);
+    ncols = size(old_delta_phi,2);
+    [XI,YI] = meshgrid(1:ncols,1:nrows);
+    XI = double(XI);
+    YI = double(YI);
 end
+
+
+%% L
+% alpha = 0.9
+% lr = 6
+% top = 7
+
+%%retina
+% alpha = 0.5
+% lr = 1
+% top = 2
 
 alpha = 0.9;
 %virt_m = 0.1;
-lr = 5; % Learning rate
+lr = 6; % Learning rate
 elapsed = 0;
 iterations = 0;
-top = 6;
+top = 7;
 
 % tmp = ls.phi;
 % tmp(tmp >= 1)  = 1;
 % tmp(tmp <= -1) = -1;
 % ls.phi = tmp;
 
-old_phi = ls.phi;
+old_phi  = ls.phi;
+old_band = ls.band;
 
 % Do one iteration if the requested time is 0
 if (time == 0)
@@ -78,7 +97,12 @@ else
     ls = rebuild_narrowband(ls);
     
     % Update level set function and exit
-    curr_delta_phi = ls.phi - old_phi;
+    common_band = intersect(ls.band, old_band);
+    [Y, X] = ind2sub(size(ls), common_band);
+    %error('hepp')
+    curr_delta_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
+    
+    
     delta_phi      = alpha * old_delta_phi + (1-alpha)*lr*curr_delta_phi;
     delta_phi(delta_phi > top) = top;
     delta_phi(delta_phi < (-top)) = -top;
