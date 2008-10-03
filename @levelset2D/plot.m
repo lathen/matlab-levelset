@@ -6,8 +6,17 @@ else
     hold on;
 
     if isenabled('phi',varargin{:})
-        imagesc(ls.phi, [min(ls.phi(:)), max(ls.phi(:))]);
-        colormap(gray);
+        max_abs = max(abs(min(ls.phi(:))), abs(max(ls.phi(:))));
+        imagesc(ls.phi, [-max_abs, max_abs]);
+        
+        % Create colormap (green outside, red inside)
+        map_size = 256;
+        R = 1 :-1/(map_size/2-1) : 0;
+        G = 0 : 1/(map_size/2-1) : 1;
+        map = zeros(map_size,3);
+        map(1:map_size/2,1) = R;
+        map(map_size/2+1:map_size,2) = G;
+        colormap(map);
     end
 
     if isenabled('narrowband',varargin{:})
