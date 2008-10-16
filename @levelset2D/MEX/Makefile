@@ -11,7 +11,8 @@ TOOLS = private/diff_central_order2 \
         private/diff_upwind_order1 \
         private/diff2_order2 \
         private/diff_upwind_WENO \
-        private/reinitialize_fastmarching
+        private/reinitialize_fastmarching \
+        private/reinitialize_fastsweeping
 
 TOOLS_MEX := $(addprefix $(BIN_PATH)/, $(TOOLS:=.$(EXT)))
 

@@ -102,6 +102,8 @@ else
                 % Do nothing, already set as standard
             case 'fastmarching'
                 ls.reinitialize = @reinitialize_fastmarching_driver;
+            case 'fastsweeping'
+                ls.reinitialize = @reinitialize_fastsweeping_driver;
             otherwise
                 error('Fifth argument is not a valid reinitialization routine');
         end
