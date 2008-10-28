@@ -10,8 +10,10 @@ persistent lr;           %Individual learning rates
 persistent XI;
 persistent YI;
 if(first_time)
+    rand('twister',sum(100*clock));
     old_grad_phi = zeros(size(ls));
     lr           = zeros(size(ls)) + LR_0;
+    %lr           = rand(size(ls))*LR_0 + 2 * LR_0;
     nrows = size(old_grad_phi,1);
     ncols = size(old_grad_phi,2);
     [XI,YI] = meshgrid(1:ncols,1:nrows);
@@ -62,6 +64,13 @@ ls = rebuild_narrowband(ls);
 common_band = intersect(ls.band, old_band);
 [Y, X] = ind2sub(size(ls), common_band);
 curr_grad_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
+%curr_grad_phi = ls.phi - old_phi;
+
+%Only use the above to calculate the gradient
+temp_phi  = ls.phi;
+temp_band = ls.band;
+ls.phi    = old_phi;
+ls.band   = old_band;
 
 %RPROP
 grad_sprod = sign(old_grad_phi .* curr_grad_phi);
@@ -72,9 +81,9 @@ dec_i  = grad_sprod < 0;
 lr(acc_i) = min(lr(acc_i) * acc_factor, LR_MAX);
 lr(dec_i) = max(lr(dec_i) * dec_factor, LR_MIN);
 delta_phi = lr .* sign(curr_grad_phi);
-%delta_phi(dec_i) = 0; %In original RPROP, do not perform update if sign change
+delta_phi(dec_i) = 0; %In original RPROP, do not perform update if sign change
 old_grad_phi = curr_grad_phi;
-%old_grad_phi(dec_i) = 0; %In original RPROP, do not adapt lr in next iteration if sign change.
+old_grad_phi(dec_i) = 0; %In original RPROP, do not adapt lr in next iteration if sign change.
 
 % Cut the rate of change so we don't move too fast
 delta_phi(delta_phi > top) = top;
@@ -87,9 +96,10 @@ ls = rebuild_narrowband(ls);
 
 % Some plots for debugging
 figure(44); hold off; clf;
-subplot(3,2,1);imagesc(old_phi);colorbar;hold on; plot(ls, 'contour y');
-subplot(3,2,2);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
-subplot(3,2,3);imagesc(curr_grad_phi);colorbar;hold on; plot(ls, 'contour y');
-subplot(3,2,4);imagesc(delta_phi);colorbar;hold on; plot(ls, 'contour y');
-subplot(3,2,5);imagesc(grad_sprod);colorbar;hold on; plot(ls, 'contour y');
+subplot(4,2,1);imagesc(old_phi);colorbar;hold on; plot(ls, 'contour y');
+subplot(4,2,2);imagesc(temp_phi);colorbar;hold on; plot(ls, 'contour y');
+subplot(4,2,3);imagesc(curr_grad_phi);colorbar;hold on; plot(ls, 'contour y');
+subplot(4,2,4);imagesc(delta_phi);colorbar;hold on; plot(ls, 'contour y');
+subplot(4,2,5);imagesc(grad_sprod);colorbar;hold on; plot(ls, 'contour y');
+subplot(4,2,6);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
 drawnow;
