@@ -54,9 +54,14 @@ ls = rebuild_narrowband(ls);
 
 % Compute the current gradient and extend values to the entire grid (if we
 % have a narrowband)
-common_band = intersect(ls.band, old_band);
-[Y, X] = ind2sub(size(ls), common_band);
-curr_delta_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
+curr_delta_phi = [];
+if(isinf(ls.bandwidth))
+    curr_delta_phi = ls.phi - old_phi;
+else
+    common_band = intersect(ls.band, old_band);
+    [Y, X] = ind2sub(size(ls), common_band);
+    curr_delta_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
+end
 
 % Compute the rate of change given the previous gradient weighted with the
 % current gradient (momentum)
