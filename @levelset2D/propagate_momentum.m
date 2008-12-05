@@ -68,8 +68,9 @@ end
 delta_phi = alpha * old_delta_phi + (1-alpha)*lr*curr_delta_phi;
 
 % Cut the rate of change so we don't move too fast
-delta_phi(delta_phi > top) = top;
-delta_phi(delta_phi < (-top)) = -top;
+%delta_phi(delta_phi > top) = top;
+%delta_phi(delta_phi < (-top)) = -top;
+delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
 
 % Save the current gradient for next call
 old_delta_phi = delta_phi;

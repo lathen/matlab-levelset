@@ -1,7 +1,7 @@
-function C = plot(ls, varargin)
+function [C,h] = plot(ls, varargin)
 
 if isempty(varargin)
-    [C,H] = contour(ls.phi,[0 0],'r');
+    [C,h] = contour(ls.phi,[0 0],'r');
 else
     hold on;
 
@@ -33,9 +33,9 @@ else
     if isenabled('contour',varargin{:})
         param = getparameters('contour', varargin{:});
         if isempty(param)
-            contour(ls.phi,[0 0],'r');
+            [C,h] = contour(ls.phi,[0 0],'r');
         else
-            contour(ls.phi,[0 0],param);
+            [C,h] = contour(ls.phi,[0 0],param);
         end
     end
 

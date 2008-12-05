@@ -7,14 +7,15 @@ rows = s(1); cols = s(2);
 Fx = ones(rows,cols);
 Fy = -ones(rows,cols);
 
+figure;
+
 % Propagate
 time = 1;
 for i = 1:30
     tic; [LS,iter] = propagate(LS,time,'advect', Fx,Fy); toc
     tic; LS = rebuild_narrowband(LS); toc
-    figure(100);
     clf;
-    plot(LS, 'contour', 'phi', 'gradient 5', 'narrowband');
+    plot(LS, 'contour', 'phi', 'gradient 5');
     drawnow;
 end
 
