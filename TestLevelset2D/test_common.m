@@ -14,7 +14,7 @@ mask = imresize(mask, [height width]);
 mask = mask > 100; % make binary
 
 % Compute signed distance transform (negative inside, positive outside)
-A = 10 - 20*mask; % alternative initialization only around zero-crossing
+A = 10 - 20*mask; % initialization only around zero-crossing
 
 % Create levelset2D and plot
 %LS = levelset2D(A);
