@@ -1,4 +1,3 @@
-
 function [ls, iterations, elapsed] = propagate_rprop(ls, time, LR_MAX, LR_MIN, LR_0, top, first_time, operator, varargin)
 
 acc_factor = 1.2; %Constant
@@ -57,7 +56,7 @@ end
 iterations
 
 % Rebuild the distance function and the narrowband
-ls = rebuild_narrowband(ls);
+ls = reinitialize(ls);
 
 % Compute the current gradient and extend values to the entire grid (if we
 % have a narrowband)
@@ -92,7 +91,7 @@ delta_phi(delta_phi < (-top)) = -top;
 
 % Update level set function and reinitialize
 ls.phi = old_phi + delta_phi;
-ls = rebuild_narrowband(ls);
+ls = reinitialize(ls);
 
 % Some plots for debugging
 figure(44); hold off; clf;

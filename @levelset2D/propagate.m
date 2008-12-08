@@ -1,4 +1,3 @@
-
 function [ls,iterations, elapsed] = propagate(ls, time, operator, varargin)
 
 % Start some counters

@@ -1,4 +1,3 @@
-
 function ls = reinitialize_fastmarching_driver(ls)
 
 %band = ls.band;

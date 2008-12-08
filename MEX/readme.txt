@@ -1,7 +1,7 @@
 
 == Unix ==
 
-To compile on unix-based systems, run 'make' in this directory.
+To compile on unix-based systems, run 'make.m' within MATLAB
 
 
 == Windows ==

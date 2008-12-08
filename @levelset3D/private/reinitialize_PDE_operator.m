@@ -1,4 +1,4 @@
-function [ddt,dt] = reinitialize(ls, varargin)
+function [ddt,dt] = reinitialize_PDE_operator(ls, varargin)
 
 % Compute the sign function
 [Dx,Dy,Dz] = diff_central(ls);

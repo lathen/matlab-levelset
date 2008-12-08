@@ -1,4 +1,3 @@
-
 function ls = reinitialize_fastsweeping_driver(ls)
 
 %band = ls.band;

@@ -1,51 +1,12 @@
 function ls = levelset2D(varargin)
 %LEVELSET2D Create a levelset2D object.
-%   LS = LEVELSET2D(A), where A is a numeric 2-D array, creates a
-%   levelset2D object with A as the level set function (preferably a signed
-%   distance function). Standard first order Euler is used for time
-%   integration and first order finite differences are used in space.
-%
-%   LS = LEVELSET2D(A,T), where T is a string, creates a levelset2D object
-%   with A as the level set function and time integration as specified in
-%   T. Currently supported integration schemes are:
-%
-%       Euler
-%
-%   LS = LEVELSET2D(A,T,S), where T is a string, creates a levelset2D
-%   object with A as the level set function, time integration as specified
-%   in T and spatial discretization as specified in S. Currently supported
-%   spatial discretization schemes are:
-%
-%       FirstOrder
-%       WENO
-%
-%   LS = LEVELSET2D(A,T,S,I), where T is a string, creates a levelset2D
-%   object with A as the level set function, time integration as specified
-%   in T, spatial discretization as specified in S and reinitialization as
-%   as specified in I. Currently supported reinitialization routines are:
-%
-%       PDE
-%       FastMarching
-%
-%   Examples:
-%       width = 64;
-%       height = 64;
-%       mask = zeros(width,height);
-%       mask(width/2-width/4:width/2+width/4, height/2-height/4:height/2+height/4) = 1;
-%       mask = mask==1;
-%       A = zeros(size(mask));
-%       dist = bwdist(mask);
-%       A(~mask) = dist(~mask);
-%       dist = -bwdist(~mask);
-%       A(mask) = dist(mask);
-%       LS = levelset2D(A);
-%       plot(LS);
-%
+%   TODO: Comment the code
 %   See also PROPAGATE, PLOT.
 
-%   Author: Gunnar Johansson (Gunnar.Johansson@itn.liu.se)
+%   Author: Gunnar Läthén (gunnar.lathen@itn.liu.se)
 %   $Date: 2007/10/17
 
+% Set some standard arguments
 ls.phi = [];
 ls.band = [];
 ls.bandwidth = Inf;

@@ -33,14 +33,8 @@ LS = levelset3D(B,5, 'Euler', 'FirstOrder', 'FastMarching');
 figure;
 plot(LS, 'contour');
 
-% Check largest gradient  magnitude
-[Dx,Dy,Dz] = diff_central(LS);
-normgrad = sqrt(Dx.^2 + Dy.^2 + Dz.^2);
-min_gradient = min(normgrad(:))
-max_gradient = max(normgrad(:))
-
 % Reinitialize
-tic; LS = rebuild_narrowband(LS); toc
+tic; LS = reinitialize(LS); toc
 figure;
 plot(LS, 'contour', 'narrowband 5');
 
@@ -55,8 +49,8 @@ LS_mean = levelset3D(LS);
 % Propagate
 time = 5;
 for i = 1:30
-    tic; [LS,iter] = propagate(LS,time,'min_curvature_flow',1); toc
-    tic; LS = rebuild_narrowband(LS); toc
+    tic; [LS,iter] = propagate(LS,time,'min_curvature_flow_operator',1); toc
+    tic; LS = reinitialize(LS); toc
 
     %tic; [LS_mean,iter] = propagate(LS_mean,time,'mean_curvature_flow',1); toc
     %tic; LS_mean = rebuild_narrowband(LS_mean); toc

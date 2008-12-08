@@ -1,5 +1,6 @@
 
-test_common;
+addpath('..')
+init;
 
 % Create vector field (note that origin is in upper left corner)
 s = size(LS);
@@ -8,13 +9,16 @@ Fx = ones(rows,cols,slices);
 Fy = -ones(rows,cols,slices);
 Fz = ones(rows,cols,slices);
 
+figure;
+
 % Propagate
 time = 1;
 for i = 1:20
-    tic; [LS,iter] = propagate(LS,time,'advect', Fx,Fy,Fz); toc
-    tic; LS = rebuild_narrowband(LS); toc
-    figure;
+    tic; [LS,iter] = propagate(LS,time,'advect_operator', Fx,Fy,Fz); toc
+    tic; LS = reinitialize(LS); toc
+    clf;
     plot(LS, 'contour', 'gradient 5');
+    view(28,30);
     drawnow;
 end
 

@@ -1,5 +1,5 @@
 
-function [ddt,dt] = mean_curvature_flow(ls, varargin)
+function [ddt,dt] = min_curvature_flow_operator(ls, varargin)
 
 if isempty(varargin{1})
     error('Need to specify magnitude of curvature flow');
@@ -15,7 +15,8 @@ end
 dt = 0.9/(6*max(abs(a(:))));
 
 [Dx,Dy,Dz] = diff_central(ls);
-k = mean_curvature(ls);
+k = min_curvature(ls);
 
 ddt = a .* k .* sqrt(Dx.^2 + Dy.^2 + Dz.^2);
 ddt(isnan(k)) = 0;
+ddt(isinf(k)) = 0;

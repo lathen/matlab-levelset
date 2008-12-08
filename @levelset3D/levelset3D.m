@@ -1,45 +1,13 @@
 function ls = levelset3D(varargin)
 %LEVELSET3D Create a levelset3D object.
-%   LS = LEVELSET3D(A), where A is a numeric 3-D array, creates a
-%   levelset3D object with A as the level set function (preferably a signed
-%   distance function). Standard first order Euler is used for time
-%   integration and first order finite differences are used in space.
-%
-%   LS = LEVELSET3D(A,T), where T is a string, creates a levelset3D object
-%   with A as the level set function and time integration as specified in
-%   T. Currently supported integration schemes are:
-%
-%       Euler
-%
-%   LS = LEVELSET3D(A,T,S), where T is a string, creates a levelset3D
-%   object with A as the level set function, time integration as specified
-%   in T and spatial discretization as specified in S. Currently supported
-%   spatial discretization schemes are:
-%
-%       FirstOrder
-%
-%   Examples:
-%       width = 64;
-%       height = 64;
-%       depth = 64
-%       mask = zeros(width,height,depth);
-%       mask(width/2-width/4:width/2+width/4, ...
-%            height/2-height/4:height/2+height/4, ...
-%            depth/2-depth/4:depth/2+depth/4) = 1;
-%       mask = mask==1;
-%       A = zeros(size(mask));
-%       dist = bwdist(mask);
-%       A(~mask) = dist(~mask);
-%       dist = -bwdist(~mask);
-%       A(mask) = dist(mask);
-%       LS = levelset3D(A);
-%       plot(LS);
+%   TODO: Comment the code
 %
 %   See also PROPAGATE, PLOT.
 
-%   Author: Gunnar Johansson (Gunnar.Johansson@itn.liu.se)
+%   Author: Gunnar Läthén (gunnar.lathen@itn.liu.se)
 %   $Date: 2007/10/17
 
+% Set standard arguments
 ls.phi = [];
 ls.band = [];
 ls.bandwidth = Inf;

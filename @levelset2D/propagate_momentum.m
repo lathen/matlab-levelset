@@ -1,4 +1,3 @@
-
 function [ls, iterations, elapsed] = propagate_momentum(ls, time, alpha, lr, top, operator, varargin)
 
 % Set some persistent variables to store momentum for next call
@@ -50,7 +49,7 @@ end
 iterations
 
 % Rebuild the distance function and the narrowband
-ls = rebuild_narrowband(ls);
+ls = reinitialize(ls);
 
 % Compute the current gradient and extend values to the entire grid (if we
 % have a narrowband)
@@ -77,7 +76,7 @@ old_delta_phi = delta_phi;
 
 % Update level set function and reinitialize
 ls.phi = old_phi + delta_phi;
-ls = rebuild_narrowband(ls);
+ls = reinitialize(ls);
 
 % Some plots for debugging
 figure(44); hold off; clf;

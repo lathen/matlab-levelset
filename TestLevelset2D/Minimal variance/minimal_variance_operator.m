@@ -1,5 +1,5 @@
 
-function [ddt,dt] = minimal_variance(ls, varargin)
+function [ddt,dt] = minimal_variance_operator(ls, varargin)
 
 if isempty(varargin)
     error('Need to specify image to segment');

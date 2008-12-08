@@ -1,9 +1,11 @@
-function [phi,dt] = euler(ls, time, elapsed, operator, varargin)
+function [phi,dt] = euler(ls, max_dt, operator, varargin)
 
 % Evaluate operator and let the operator determine a stable time step
 [ddt,dt] = feval(operator, ls, varargin{:});
-if dt > time-elapsed
-    dt = time-elapsed;
+
+% If stable timestep exceeds max requested time, clamp...
+if dt > max_dt
+    dt = max_dt;
 end
 
 % Propagate the solution one time step

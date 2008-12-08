@@ -1,4 +1,3 @@
-
 function ls = reinitialize_PDE(ls)
 
 % Create binary mask for dilation of the narrow band
@@ -20,7 +19,7 @@ else
 end
 
 % Run the reinitialize operator
-[ls,iter] = propagate(ls,delta,'reinitialize');
+[ls,iter] = propagate(ls,delta,'reinitialize_PDE_operator');
 
 % Update the band
 ls.band = ls.band((abs(ls.phi(ls.band)) <= ls.bandwidth));
