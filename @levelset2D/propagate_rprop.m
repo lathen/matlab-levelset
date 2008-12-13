@@ -85,9 +85,9 @@ old_grad_phi = curr_grad_phi;
 old_grad_phi(dec_i) = 0; %In original RPROP, do not adapt lr in next iteration if sign change.
 
 % Cut the rate of change so we don't move too fast
-delta_phi(delta_phi > top) = top;
-delta_phi(delta_phi < (-top)) = -top;
-
+%delta_phi(delta_phi > top) = top;
+%delta_phi(delta_phi < (-top)) = -top;
+delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
 
 % Update level set function and reinitialize
 ls.phi = old_phi + delta_phi;
