@@ -46,8 +46,6 @@ else
     end    
 end
 
-iterations
-
 % Rebuild the distance function and the narrowband
 ls = reinitialize(ls);
 
@@ -62,6 +60,9 @@ else
     curr_delta_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
 end
 
+% Divide by time to approximate gradient
+curr_delta_phi = curr_delta_phi / elapsed;
+
 % Compute the rate of change given the previous gradient weighted with the
 % current gradient (momentum)
 delta_phi = alpha * old_delta_phi + (1-alpha)*lr*curr_delta_phi;
@@ -75,14 +76,14 @@ delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
 old_delta_phi = delta_phi;
 
 % Update level set function and reinitialize
-ls.phi = old_phi + delta_phi;
+ls.phi = old_phi + elapsed*delta_phi;
 ls = reinitialize(ls);
 
 % Some plots for debugging
-figure(44); hold off; clf;
-subplot(3,2,1);imagesc(old_phi);colorbar;hold on; plot(ls, 'contour y');
-subplot(3,2,2);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
-subplot(3,2,3);imagesc(old_delta_phi);colorbar;hold on; plot(ls, 'contour y');
-subplot(3,2,4);imagesc(lr*curr_delta_phi);colorbar;hold on; plot(ls, 'contour y');
-subplot(3,2,5);imagesc(abs(lr*curr_delta_phi- old_delta_phi));colorbar;hold on; plot(ls, 'contour y');
-drawnow;
+% figure(44); hold off; clf;
+% subplot(3,2,1);imagesc(old_phi);colorbar;hold on; plot(ls, 'contour y');
+% subplot(3,2,2);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
+% subplot(3,2,3);imagesc(old_delta_phi);colorbar;hold on; plot(ls, 'contour y');
+% subplot(3,2,4);imagesc(lr*curr_delta_phi);colorbar;hold on; plot(ls, 'contour y');
+% subplot(3,2,5);imagesc(abs(lr*curr_delta_phi- old_delta_phi));colorbar;hold on; plot(ls, 'contour y');
+% drawnow;
