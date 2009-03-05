@@ -18,6 +18,7 @@
 #include "IndexArray.h"
 #include "Matrix3x3.h"
 #include <limits>
+#include <algorithm>
 
 template <typename DataType>
 class Vector
