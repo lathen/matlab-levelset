@@ -116,10 +116,18 @@ ls.phi = old_phi + delta_phi;
 ls = reinitialize(ls);
 
 %The sign we really took
-curr_grad_phi = ls.phi - old_phi;
+real_grad_phi = ls.phi - old_phi;
+figure(100); hold off; clf;
+imagesc(real_grad_phi);colorbar;hold on; plot(ls, 'contour y');
+
+sign_disagrees = sign(curr_grad_phi) ~= sign(real_grad_phi);
+figure(102); hold off; clf;
+imagesc(sign_disagrees);colorbar;hold on; plot(ls, 'contour y');
+
+curr_grad_phi = real_grad_phi;
 
 %RPROP
-grad_sprod = sign(old_grad_phi .* curr_grad_phi);
+grad_sprod = sign(old_grad_phi .* curr_grad_phi); 
 acc_i  = grad_sprod > 0;
 %null_i = grad_sprod == 0;
 dec_i  = grad_sprod < 0;
@@ -127,6 +135,7 @@ dec_i  = grad_sprod < 0;
 lr(acc_i)  = min(lr(acc_i)  * acc_factor, LR_MAX);
 lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
 %lr(null_i) = max(lr(null_i) * dec_factor, LR_MIN);
+%lr(sign_disagrees) = 2;
 
 debug_deltawin(:,:,debug_iter) = lr(rowwin,colwin); 
 
