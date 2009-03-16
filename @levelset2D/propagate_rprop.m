@@ -1,5 +1,14 @@
 function [ls, iterations, elapsed] = propagate_rprop(ls, time, LR_MAX, LR_MIN, LR_0, top, first_time, operator, varargin)
 
+global debug_phiwin;
+global debug_gradwin;
+global debug_deltawin;
+global debug_iter;
+global debug_time;
+global rowwin;
+global colwin;
+global debug_latestold;
+
 acc_factor = 1.2; %Constant
 dec_factor = 0.5; %Constant
 
@@ -18,7 +27,21 @@ if(first_time)
     [XI,YI] = meshgrid(1:ncols,1:nrows);
     XI = double(XI);
     YI = double(YI);
+    
+    
+    debug_phiwin   = zeros(13,13,400);
+    debug_gradwin  = zeros(13,13,400);
+    debug_deltawin = zeros(13,13,400);
+    debug_time     = zeros(1,400);
+    debug_iter     = 0;
+    
+    crow  = 130;
+    ccol  = 150;
+    rowwin = (crow-6):(crow+6);
+    colwin = (ccol-6):(ccol+6);
 end
+
+debug_iter = debug_iter + 1;
 
 % Start counters
 elapsed = 0;
@@ -71,6 +94,11 @@ temp_band = ls.band;
 ls.phi    = old_phi;
 ls.band   = old_band;
 
+debug_phiwin(:,:,debug_iter) = old_phi(rowwin,colwin);
+debug_latestold = old_phi;
+debug_gradwin(:,:,debug_iter) = curr_grad_phi(rowwin,colwin);
+
+
 %RPROP
 grad_sprod = sign(old_grad_phi .* curr_grad_phi);
 acc_i  = grad_sprod > 0;
@@ -79,6 +107,10 @@ dec_i  = grad_sprod < 0;
 
 lr(acc_i) = min(lr(acc_i) * acc_factor, LR_MAX);
 lr(dec_i) = max(lr(dec_i) * dec_factor, LR_MIN);
+
+debug_deltawin(:,:,debug_iter) = lr(rowwin,colwin); 
+
+
 delta_phi = lr .* sign(curr_grad_phi);
 delta_phi(dec_i) = 0; %In original RPROP, do not perform update if sign change
 old_grad_phi = curr_grad_phi;
