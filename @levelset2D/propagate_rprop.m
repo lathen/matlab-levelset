@@ -83,10 +83,10 @@ ls = reinitialize(ls);
 
 % Compute the current gradient and extend values to the entire grid (if we
 % have a narrowband)
-common_band = intersect(ls.band, old_band);
-[Y, X] = ind2sub(size(ls), common_band);
-curr_grad_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
-%curr_grad_phi = ls.phi - old_phi;
+%common_band = intersect(ls.band, old_band);
+%[Y, X] = ind2sub(size(ls), common_band);
+%curr_grad_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
+curr_grad_phi = ls.phi - old_phi;
 
 %Only use the above to calculate the gradient
 temp_phi  = ls.phi;
@@ -105,8 +105,9 @@ acc_i  = grad_sprod > 0;
 %null_i = grad_sprod == 0;
 dec_i  = grad_sprod < 0;
 
-lr(acc_i) = min(lr(acc_i) * acc_factor, LR_MAX);
-lr(dec_i) = max(lr(dec_i) * dec_factor, LR_MIN);
+lr(acc_i)  = min(lr(acc_i)  * acc_factor, LR_MAX);
+lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
+%lr(null_i) = max(lr(null_i) * dec_factor, LR_MIN);
 
 debug_deltawin(:,:,debug_iter) = lr(rowwin,colwin); 
 
@@ -134,3 +135,4 @@ subplot(4,2,4);imagesc(delta_phi);colorbar;hold on; plot(ls, 'contour y');
 subplot(4,2,5);imagesc(grad_sprod);colorbar;hold on; plot(ls, 'contour y');
 subplot(4,2,6);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
 drawnow;
+%pause;
