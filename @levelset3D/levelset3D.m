@@ -1,6 +1,25 @@
 function ls = levelset3D(varargin)
-%LEVELSET3D Create a levelset3D object.
-%   TODO: Comment the code
+%LEVELSET3D  Create a levelset3D object.
+%   LS = LEVELSET3D(A, [nband, temporal, spatial, reinit]) creates a 
+%   levelset3D object with level set function A. This does not generally
+%   require A to be a signed distance function.
+%
+%   If nband is specified, a narrowband is used for faster computations.
+%   All points x in A such that |x| < nband are included in the narrowband.
+%   Default value is Inf.
+%
+%   The temporal parameter can be specified to set an integration method
+%   for the temporal discretization. Default is 'Euler'. Possible values
+%   are: 'Euler'
+%
+%   The spatial parameter can be specified to set a finite difference
+%   scheme for the spatial discretation. Default is 'FirstOrder'. Possible
+%   values are: 'FirstOrder'
+%
+%   The reinit parameter can be specified to set a method for
+%   reinitilization (resetting the level set function to a signed distance
+%   function and adjusting the narrowband). Default is 'FastMarching'.
+%   Possible values are: 'FastMarching', 'PDE'
 %
 %   See also PROPAGATE, PLOT.
 
@@ -15,7 +34,7 @@ ls.integrate = @euler;
 ls.diff_central = @diff_central_order2;
 ls.diff_upwind = @diff_upwind_order1;
 ls.diff2 = @diff2_order2;
-ls.reinitialize = @reinitialize_PDE;
+ls.reinitialize = @reinitialize_fastmarching_driver;
 
 if nargin == 0
     ls = class(ls,'levelset3D');
@@ -58,10 +77,10 @@ else
     
     if nargin >= 5
         switch lower(varargin{5})
-            case 'pde'
-                % Do nothing, already set as standard
             case 'fastmarching'
-                ls.reinitialize = @reinitialize_fastmarching_driver;
+                % Do nothing, already set as standard
+            case 'pde'
+                ls.reinitialize = @reinitialize_PDE;
             otherwise
                 error('Fifth argument is not a valid reinitialization routine');
         end

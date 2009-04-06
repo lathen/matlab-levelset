@@ -1,7 +1,18 @@
 function plot(ls, varargin)
+% PLOT  Plots the zero level set and various attributes of a levelset3D
+%       object.
+%   [F,V,N] = PLOT(LS, ...) plots the zero level set of LS. Optional output
+%   arguments F,V,N give faces, vertices and normals of the surface mesh.
+%   A number of optional input arguments can be given:
+%       'contour'       plots the zero level set (default if no other
+%                       parameters are given)
+%       'narrowband'    plots the narrowband
+%       'gradient'      plots the gradient of the level set function
+
+%   Author: Gunnar Läthén (gunnar.lathen@itn.liu.se)
+%   $Date: 2007/10/17
 
 if isempty(varargin)
-    %isosurface(ls.phi,0);
     [F,V,N] = triangulate(ls.phi, ls.band);
     patch('Faces',F, 'Vertices',V, 'VertexNormals', N, 'FaceColor','red','EdgeColor','none');
 else

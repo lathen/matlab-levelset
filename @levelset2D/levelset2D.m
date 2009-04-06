@@ -1,6 +1,26 @@
 function ls = levelset2D(varargin)
-%LEVELSET2D Create a levelset2D object.
-%   TODO: Comment the code
+%LEVELSET2D  Create a levelset2D object.
+%   LS = LEVELSET2D(A, [nband, temporal, spatial, reinit]) creates a 
+%   levelset2D object with level set function A. This does not generally
+%   require A to be a signed distance function.
+%
+%   If nband is specified, a narrowband is used for faster computations.
+%   All points x in A such that |x| < nband are included in the narrowband.
+%   Default value is Inf.
+%
+%   The temporal parameter can be specified to set an integration method
+%   for the temporal discretization. Default is 'Euler'. Possible values
+%   are: 'Euler'
+%
+%   The spatial parameter can be specified to set a finite difference
+%   scheme for the spatial discretation. Default is 'FirstOrder'. Possible
+%   values are: 'FirstOrder', 'WENO'
+%
+%   The reinit parameter can be specified to set a method for
+%   reinitilization (resetting the level set function to a signed distance
+%   function and adjusting the narrowband). Default is 'FastSweeping'.
+%   Possible values are: 'FastSweeping', 'FastMarching', 'PDE'
+%
 %   See also PROPAGATE, PLOT.
 
 %   Author: Gunnar Läthén (gunnar.lathen@itn.liu.se)
@@ -14,7 +34,7 @@ ls.integrate = @euler;
 ls.diff_central = @diff_central_order2;
 ls.diff_upwind = @diff_upwind_order1;
 ls.diff2 = @diff2_order2;
-ls.reinitialize = @reinitialize_PDE;
+ls.reinitialize = @reinitialize_fastsweeping_driver;
 
 if nargin == 0
     ls = class(ls,'levelset2D');
@@ -59,12 +79,12 @@ else
     
     if nargin >= 5
         switch lower(varargin{5})
-            case 'pde'
+            case 'fastsweeping'
                 % Do nothing, already set as standard
             case 'fastmarching'
                 ls.reinitialize = @reinitialize_fastmarching_driver;
-            case 'fastsweeping'
-                ls.reinitialize = @reinitialize_fastsweeping_driver;
+            case 'pde'
+                ls.reinitialize = @reinitialize_PDE;
             otherwise
                 error('Fifth argument is not a valid reinitialization routine');
         end

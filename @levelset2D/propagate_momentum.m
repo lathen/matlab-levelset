@@ -1,25 +1,45 @@
-function [ls, iterations, elapsed] = propagate_momentum(ls, time, alpha, lr, top, operator, varargin)
+function [ls,iterations,elapsed] = propagate_momentum(ls, time, omega, eta, top, operator, varargin)
+%PROPAGATE_MOMENTUM  Propagate a levelset2D object a given amount of time
+%                    using a momentum approach.
+%   [LS,iterations,elapsed] = PROPAGATE_MOMENTUM(LS, time, omage, eta, top,
+%   operator, ...) propagates LS a given amount of time using a level set
+%   PDE specified by operator. If time is zero, the time integrator
+%   propagates the solution by one stable time step (assuming explicit
+%   integration). The level set PDE is preferably specified in a separate
+%   function, and operator is set to the name of this function. An
+%   arbitrary number of arguments can be given following the operator
+%   parameter. These arguments are passed to the operator function.
+%
+%   The operator function must adhere to the prototype:
+%     function [dphi_dt,dt] = levelsetPDE(LS, varargin)
+%   where dphi_dt is the evaluated level set PDE, dt is a stable time step
+%   for explicit time integration, LS is a levelset2D object and varargin
+%   specifies the parameters of the level set PDE.
+%
+%   The parameter omega specifies the momentum parameter, while eta
+%   specifies the step length as described in the paper at
+%   http://dmforge.itn.liu.se/ssvm09/
+%   This strategy is mainly used for segmentation applications.
+
+%   Author: Gunnar Läthén (gunnar.lathen@itn.liu.se)
+%   $Date: 2008/10/01
+
 
 % Set some persistent variables to store momentum for next call
-persistent old_delta_phi;
-persistent XI;
-persistent YI;
-if(isempty(old_delta_phi))
-    old_delta_phi = zeros(size(ls));
-    nrows = size(old_delta_phi,1);
-    ncols = size(old_delta_phi,2);
-    [XI,YI] = meshgrid(1:ncols,1:nrows);
-    XI = double(XI);
-    YI = double(YI);
+persistent step_previous;
+persistent domain_previous;
+if isempty(step_previous)
+    step_previous = zeros(size(ls));
+    domain_previous = 1:numel(ls);
 end
 
 % Start counters
 elapsed = 0;
 iterations = 0;
 
-% Save current level set phi and level set band
-old_phi  = ls.phi;
-old_band = ls.band;
+% Save previous level set function and narrowband
+phi_previous  = ls.phi;
+band_previous = ls.band;
 
 % Do one iteration if the requested time is 0
 if (time == 0)
@@ -49,41 +69,44 @@ end
 % Rebuild the distance function and the narrowband
 ls = reinitialize(ls);
 
-% Compute the current gradient and extend values to the entire grid (if we
-% have a narrowband)
-curr_delta_phi = [];
-if(isinf(ls.bandwidth))
-    curr_delta_phi = ls.phi - old_phi;
-else
-    common_band = intersect(ls.band, old_band);
-    [Y, X] = ind2sub(size(ls), common_band);
-    curr_delta_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
-end
+% Compute the current (approximate) gradient in the common domain,
+% given current and previous time instances
+domain = intersect(ls.band, band_previous);
+grad = (ls.phi(domain) - phi_previous(domain)) /  elapsed;
 
-% Divide by time to approximate gradient
-curr_delta_phi = curr_delta_phi / elapsed;
+% The domain of previous and current steps are different (since the
+% narrowband has moved). To fix this, first compute the distance transform
+% of the previous domain (this is only required in domain_diff, but we use
+% the convenience of built-in bwdist) 
+domain_diff = setdiff(domain, domain_previous);
+BW = false(size(ls));
+BW(domain_previous) = true;
+[D,L] = bwdist(BW);
 
-% Compute the rate of change given the previous gradient weighted with the
-% current gradient (momentum)
-delta_phi = alpha * old_delta_phi + (1-alpha)*lr*curr_delta_phi;
+% Then, extend the previous step by picking the closest values
+step_previous(domain_diff) = step_previous(L(domain_diff));
+
+% Compute the step, incorporating momentum and the previous step
+step = eta*(1-omega)*grad + omega*step_previous(domain);
 
 % Cut the rate of change so we don't move too fast
-%delta_phi(delta_phi > top) = top;
-%delta_phi(delta_phi < (-top)) = -top;
-delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
+step = 2*top ./ (1 + exp(-2*step/top)) - top;
 
-% Save the current gradient for next call
-old_delta_phi = delta_phi;
+% Save the current step and domain for next iteration
+step_previous(domain) = step;
+domain_previous = domain;
 
 % Update level set function and reinitialize
-ls.phi = old_phi + elapsed*delta_phi;
+ls.phi(domain) = phi_previous(domain) + elapsed*step;
 ls = reinitialize(ls);
 
 % Some plots for debugging
-% figure(44); hold off; clf;
-% subplot(3,2,1);imagesc(old_phi);colorbar;hold on; plot(ls, 'contour y');
-% subplot(3,2,2);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
-% subplot(3,2,3);imagesc(old_delta_phi);colorbar;hold on; plot(ls, 'contour y');
-% subplot(3,2,4);imagesc(lr*curr_delta_phi);colorbar;hold on; plot(ls, 'contour y');
-% subplot(3,2,5);imagesc(abs(lr*curr_delta_phi- old_delta_phi));colorbar;hold on; plot(ls, 'contour y');
-% drawnow;
+%  figure(44); hold off; clf;
+%  subplot(3,2,1);imagesc(phi_previous);colorbar;hold on; plot(ls, 'contour y');
+%  subplot(3,2,2);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
+%  subplot(3,2,3);imagesc(step_previous);colorbar;hold on; plot(ls, 'contour y');
+%  tmp = zeros(size(ls)); tmp(domain) = grad;
+%  subplot(3,2,4);imagesc(eta*tmp);colorbar;hold on; plot(ls, 'contour y');
+%  tmp = zeros(size(ls)); tmp(domain_diff) = 1;
+%  subplot(3,2,5);imshow(tmp, []);hold on; plot(ls, 'contour y');
+%  drawnow;

@@ -1,4 +1,17 @@
 function [C,h] = plot(ls, varargin)
+% PLOT  Plots the zero level set and various attributes of a levelset2D
+%       object.
+%   [C,h] = PLOT(LS, ...) plots the zero level set of LS. Optional output
+%   argument C contains points along the contour, and h gives a handle to
+%   the graphics object. A number of optional input arguments can be given:
+%       'phi'           displays the level set function
+%       'narrowband'    plots the narrowband
+%       'contour'       plots the zero level set (default if no other
+%                       parameters are given)
+%       'gradient'      plots the gradient of the level set function
+
+%   Author: Gunnar Läthén (gunnar.lathen@itn.liu.se)
+%   $Date: 2007/10/17
 
 if isempty(varargin)
     [C,h] = contour(ls.phi,[0 0],'r');
