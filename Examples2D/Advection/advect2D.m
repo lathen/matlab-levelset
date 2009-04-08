@@ -29,6 +29,7 @@ rows = S(1); cols = S(2);
 [Fx,Fy] = meshgrid([1:cols/2 cols/2:-1:1], [1:rows/2 rows/2:-1:1]);
 
 figure;
+d = 10;
 quiver([1:d:cols], [1:d:rows], Fx(1:d:end,1:d:end), Fy(1:d:end,1:d:end), 'g');
 hold on;
 plot(LS);
@@ -38,7 +39,6 @@ plot(LS);
 % Propagate the level set function a given amount of time using the level
 % set PDE specified in the advect_operator function:
 % <advect2D_operator.html advect2D_operator.m>
-d = 10;
 time = 0.1;
 for i = 1:10
     LS = propagate(LS,time,'advect2D_operator', Fx,Fy);

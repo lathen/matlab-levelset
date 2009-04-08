@@ -14,13 +14,17 @@ function plot(ls, varargin)
 
 if isempty(varargin)
     [F,V,N] = triangulate(ls.phi, ls.band);
-    patch('Faces',F, 'Vertices',V, 'VertexNormals', N, 'FaceColor','red','EdgeColor','none');
+    if ~isempty(V)
+        patch('Faces',F, 'Vertices',V, 'VertexNormals', N, 'FaceColor','red','EdgeColor','none');
+    end
 else
 
     if isenabled('contour',varargin{:})
         %isosurface(ls.phi,0);
         [F,V,N] = triangulate(ls.phi, ls.band);
-        patch('Faces',F, 'Vertices',V, 'VertexNormals', N, 'FaceColor','red','EdgeColor','none');
+        if ~isempty(V)
+            patch('Faces',F, 'Vertices',V, 'VertexNormals', N, 'FaceColor','red','EdgeColor','none');
+        end
     end
 
     hold on;
@@ -43,16 +47,9 @@ else
         if ~isnan(x)
             delta = x;
         end            
-        ind = uint32(1:numel(ls.phi));
-        [Dx,Dy,Dz] = ls.diff_central(ls.phi, ind);
-        [rows,cols,slices] = size(ls.phi);
-        Dx = reshape(Dx,rows,cols,slices)*delta;
-        Dy = reshape(Dy,rows,cols,slices)*delta;
-        Dz = reshape(Dz,rows,cols,slices)*delta;
-        Dx = reducevolume(Dx,delta);
-        Dy = reducevolume(Dy,delta);
-        Dz = reducevolume(Dz,delta);
-        quiver3(delta, Dx, Dy, Dz, 0, 'b');
+        [Dx,Dy,Dz] = diff_central(ls);
+        [I,J,K] = ind2sub(size(ls.phi), narrowband(ls));
+        quiver3(J,I,K, Dx, Dy, Dz, 'b');
     end
 end
 
