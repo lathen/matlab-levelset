@@ -7,7 +7,7 @@ To compile on unix-based systems, run 'make.m' within MATLAB
 == Windows ==
 
 To compile on Windows, follow directions at:
-http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=13321&objectType=file
+http://www.mathworks.com/matlabcentral/fileexchange/13321
 
 Then run the 'make.m' script within MATLAB.
 
