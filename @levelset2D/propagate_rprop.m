@@ -51,6 +51,10 @@ iterations = 0;
 old_phi  = ls.phi;
 old_band = ls.band;
 
+% Rebuild the distance function and the narrowband
+%ls = reinitialize(ls);
+%dummy = ls.phi;
+
 % Do one iteration if the requested time is 0
 if (time == 0)
     
@@ -87,6 +91,7 @@ ls = reinitialize(ls);
 %[Y, X] = ind2sub(size(ls), common_band);
 %curr_grad_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
 curr_grad_phi = ls.phi - old_phi;
+%curr_grad_phi = ls.phi - dummy;
 
 %Only use the above to calculate the gradient
 temp_phi  = ls.phi;
@@ -98,6 +103,20 @@ debug_phiwin(:,:,debug_iter) = old_phi(rowwin,colwin);
 debug_latestold = old_phi;
 debug_gradwin(:,:,debug_iter) = curr_grad_phi(rowwin,colwin);
 
+
+delta_phi = lr .* sign(curr_grad_phi);
+
+% Cut the rate of change so we don't move too fast
+%delta_phi(delta_phi > top) = top;
+%delta_phi(delta_phi < (-top)) = -top;
+delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
+
+% Update level set function and reinitialize
+ls.phi = old_phi + delta_phi;
+ls = reinitialize(ls);
+
+%The sign we really took
+curr_grad_phi = ls.phi - old_phi;
 
 %RPROP
 grad_sprod = sign(old_grad_phi .* curr_grad_phi);
@@ -112,19 +131,11 @@ lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
 debug_deltawin(:,:,debug_iter) = lr(rowwin,colwin); 
 
 
-delta_phi = lr .* sign(curr_grad_phi);
-delta_phi(dec_i) = 0; %In original RPROP, do not perform update if sign change
+%delta_phi(dec_i) = 0; %In original RPROP, do not perform update if sign change
 old_grad_phi = curr_grad_phi;
-old_grad_phi(dec_i) = 0; %In original RPROP, do not adapt lr in next iteration if sign change.
+%old_grad_phi(dec_i) = 0; %In original RPROP, do not adapt lr in next iteration if sign change.
 
-% Cut the rate of change so we don't move too fast
-%delta_phi(delta_phi > top) = top;
-%delta_phi(delta_phi < (-top)) = -top;
-delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
 
-% Update level set function and reinitialize
-ls.phi = old_phi + delta_phi;
-ls = reinitialize(ls);
 
 % Some plots for debugging
 figure(44); hold off; clf;
