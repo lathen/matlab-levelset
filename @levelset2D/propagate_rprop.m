@@ -14,12 +14,14 @@ dec_factor = 0.5; %Constant
 
 % Set some persistent variables to store momentum for next call
 persistent old_grad_phi; %Old gradient
+persistent old_real_grad_phi; %Old gradient
 persistent lr;           %Individual learning rates
 persistent XI;
 persistent YI;
 if(first_time)
     rand('twister',sum(100*clock));
-    old_grad_phi = zeros(size(ls));
+    old_grad_phi      = zeros(size(ls));
+    old_real_grad_phi = zeros(size(ls));
     lr           = zeros(size(ls)) + LR_0;
     %lr           = rand(size(ls))*LR_0 + 2 * LR_0;
     nrows = size(old_grad_phi,1);
@@ -29,14 +31,14 @@ if(first_time)
     YI = double(YI);
     
     
-    debug_phiwin   = zeros(13,13,400);
-    debug_gradwin  = zeros(13,13,400);
-    debug_deltawin = zeros(13,13,400);
-    debug_time     = zeros(1,400);
+    debug_phiwin   = zeros(13,13,2000);
+    debug_gradwin  = zeros(13,13,2000);
+    debug_deltawin = zeros(13,13,2000);
+    debug_time     = zeros(1,2000);
     debug_iter     = 0;
     
-    crow  = 130;
-    ccol  = 150;
+    crow  = 163;
+    ccol  = 243;
     rowwin = (crow-6):(crow+6);
     colwin = (ccol-6):(ccol+6);
 end
@@ -120,6 +122,9 @@ real_grad_phi = ls.phi - old_phi;
 figure(100); hold off; clf;
 imagesc(real_grad_phi);colorbar;hold on; plot(ls, 'contour y');
 
+figure(101); hold off; clf;
+imagesc(curr_grad_phi);colorbar;hold on; plot(ls, 'contour y');
+
 sign_disagrees = sign(curr_grad_phi) ~= sign(real_grad_phi);
 figure(102); hold off; clf;
 imagesc(sign_disagrees);colorbar;hold on; plot(ls, 'contour y');
@@ -127,21 +132,34 @@ imagesc(sign_disagrees);colorbar;hold on; plot(ls, 'contour y');
 curr_grad_phi = real_grad_phi;
 
 %RPROP
-grad_sprod = sign(old_grad_phi .* curr_grad_phi); 
-acc_i  = grad_sprod > 0;
+grad_sprod      = sign(old_grad_phi .* curr_grad_phi);
+real_grad_sprod = sign(old_real_grad_phi .* real_grad_phi); 
+acc_i  = (grad_sprod > 0);
 %null_i = grad_sprod == 0;
-dec_i  = grad_sprod < 0;
+dec_i  = (grad_sprod < 0);
+incon_i  = (real_grad_sprod < 0);
+
 
 lr(acc_i)  = min(lr(acc_i)  * acc_factor, LR_MAX);
 lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
 %lr(null_i) = max(lr(null_i) * dec_factor, LR_MIN);
+%lr(incon_i)  = max(lr(incon_i)  * dec_factor, LR_MIN);
+
 %lr(sign_disagrees) = 2;
+
+figure(103); hold off; clf;
+imagesc(acc_i);colorbar;hold on; plot(ls, 'contour y');
+
+figure(104); hold off; clf;
+imagesc(lr);colorbar;hold on; plot(ls, 'contour y');
+
 
 debug_deltawin(:,:,debug_iter) = lr(rowwin,colwin); 
 
 
 %delta_phi(dec_i) = 0; %In original RPROP, do not perform update if sign change
-old_grad_phi = curr_grad_phi;
+old_grad_phi      = curr_grad_phi;
+old_real_grad_phi = real_grad_phi;
 %old_grad_phi(dec_i) = 0; %In original RPROP, do not adapt lr in next iteration if sign change.
 
 
@@ -155,4 +173,4 @@ subplot(4,2,4);imagesc(delta_phi);colorbar;hold on; plot(ls, 'contour y');
 subplot(4,2,5);imagesc(grad_sprod);colorbar;hold on; plot(ls, 'contour y');
 subplot(4,2,6);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
 drawnow;
-%pause;
+pause;
