@@ -15,12 +15,14 @@ dec_factor = 0.5; %Constant
 % Set some persistent variables to store momentum for next call
 persistent old_grad_phi; %Old gradient
 persistent old_real_grad_phi; %Old gradient
+persistent real_grad_phi;
 persistent lr;           %Individual learning rates
 persistent XI;
 persistent YI;
 if(first_time)
     rand('twister',sum(100*clock));
     old_grad_phi      = zeros(size(ls));
+    real_grad_phi     = zeros(size(ls));
     old_real_grad_phi = zeros(size(ls));
     lr           = zeros(size(ls)) + LR_0;
     %lr           = rand(size(ls))*LR_0 + 2 * LR_0;
@@ -118,30 +120,51 @@ ls.phi = old_phi + delta_phi;
 ls = reinitialize(ls);
 
 %The sign we really took
-real_grad_phi = ls.phi - old_phi;
+real_grad_phi = 0*real_grad_phi + 1*(ls.phi - old_phi);
 figure(100); hold off; clf;
-imagesc(real_grad_phi);colorbar;hold on; plot(ls, 'contour y');
+imagesc(curr_grad_phi);colorbar;hold on; plot(ls, 'contour y');
 
 figure(101); hold off; clf;
-imagesc(curr_grad_phi);colorbar;hold on; plot(ls, 'contour y');
+imagesc(real_grad_phi);colorbar;hold on; plot(ls, 'contour y');
 
 sign_disagrees = sign(curr_grad_phi) ~= sign(real_grad_phi);
 figure(102); hold off; clf;
 imagesc(sign_disagrees);colorbar;hold on; plot(ls, 'contour y');
 
-curr_grad_phi = real_grad_phi;
-
 %RPROP
 grad_sprod      = sign(old_grad_phi .* curr_grad_phi);
-real_grad_sprod = sign(old_real_grad_phi .* real_grad_phi); 
-acc_i  = (grad_sprod > 0);
+real_grad_sprod = sign(old_real_grad_phi .* real_grad_phi);
+cross_sprod     = sign(curr_grad_phi .* real_grad_phi);
+
+%acc_i = (old_grad_phi ~= 0) & ...
+%   (sign(old_grad_phi)      == sign(curr_grad_phi)) & ...
+%   (sign(old_real_grad_phi) == sign(real_grad_phi)) & ...
+%   (sign(curr_grad_phi)     == sign(real_grad_phi));
+
+%acc_i = (grad_sprod > 0) | (real_grad_sprod > 0);
+%acc_i = (real_grad_sprod > 0);
+acc_i = (grad_sprod > 0);
+
+
+%dec_i = ((grad_sprod > 0) & (real_grad_sprod < 0));
+%dec_i = (grad_sprod < 0) & (real_grad_sprod < 0);
+%dec_i = (real_grad_sprod < 0);
+%dec_i = ((real_grad_sprod < 0) & (grad_sprod > 0) & (abs(ls.phi) >=1)) | ...
+%        ((real_grad_sprod < 0) & (abs(ls.phi) < 1));
+
+%dec_i = ((real_grad_sprod < 0) & (grad_sprod > 0) & (abs(ls.phi) >=1));
+
+%acc_i  = (grad_sprod > 0);
 %null_i = grad_sprod == 0;
 dec_i  = (grad_sprod < 0);
-incon_i  = (real_grad_sprod < 0);
+%dec_i  = (grad_sprod < 0) & (sign(the_grad) == sign(curr_grad_phi));
+%incon_i  = (real_grad_sprod < 0);
 
 
 lr(acc_i)  = min(lr(acc_i)  * acc_factor, LR_MAX);
 lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
+%lr = min(lr, 2*abs(ls.phi)+0.1);
+
 %lr(null_i) = max(lr(null_i) * dec_factor, LR_MIN);
 %lr(incon_i)  = max(lr(incon_i)  * dec_factor, LR_MIN);
 
@@ -151,6 +174,9 @@ figure(103); hold off; clf;
 imagesc(acc_i);colorbar;hold on; plot(ls, 'contour y');
 
 figure(104); hold off; clf;
+imagesc(dec_i);colorbar;hold on; plot(ls, 'contour y');
+
+figure(105); hold off; clf;
 imagesc(lr);colorbar;hold on; plot(ls, 'contour y');
 
 
@@ -173,4 +199,4 @@ subplot(4,2,4);imagesc(delta_phi);colorbar;hold on; plot(ls, 'contour y');
 subplot(4,2,5);imagesc(grad_sprod);colorbar;hold on; plot(ls, 'contour y');
 subplot(4,2,6);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
 drawnow;
-pause;
+%pause;
