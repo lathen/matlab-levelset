@@ -1,4 +1,4 @@
-function plot(ls, varargin)
+function [F,V,N] = plot(ls, varargin)
 % PLOT  Plots the zero level set and various attributes of a levelset3D
 %       object.
 %   [F,V,N] = PLOT(LS, ...) plots the zero level set of LS. Optional output
