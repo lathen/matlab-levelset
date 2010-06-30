@@ -74,6 +74,9 @@ ls = reinitialize(ls);
 domain = intersect(ls.band, band_previous);
 grad = (ls.phi(domain) - phi_previous(domain)) /  elapsed;
 
+
+
+
 % The domain of previous and current steps are different (since the
 % narrowband has moved). To fix this, first compute the distance transform
 % of the previous domain (this is only required in domain_diff, but we use
