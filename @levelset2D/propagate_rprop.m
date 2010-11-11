@@ -12,7 +12,8 @@ if(first_time)
    %rand('twister',sum(100*clock));
    old_grad_phi  = zeros(size(ls));
    old_grad_band = ls.band; 
-   lr           = zeros(size(ls)) + LR_0;
+   lr           = zeros(size(ls)) + LR_MAX;
+   lr(ls.band)  = LR_0;
    %lr           = rand(size(ls))*LR_0 + 2 * LR_0;
 end
 
@@ -23,9 +24,10 @@ iterations = 0;
 % Save current level set phi and level set band
 old_phi  = ls.phi;
 old_band = ls.band;
-old_D    = bwdist(old_phi <= 0) - bwdist(old_phi >= 0);
-figure;imagesc(old_D);pause
-
+%old_D    = bwdist(old_phi <= 0) - bwdist(old_phi >= 0);
+%figure;imagesc(old_D);pause
+%figure(44);imagesc(lr);colorbar;
+%figure(45);imagesc(old_phi);colorbar;
 % Do one iteration if the requested time is 0
 if (time == 0)
     
