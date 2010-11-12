@@ -5,13 +5,13 @@ dec_factor = 0.5; %Constant
 
 % Set some persistent variables to store momentum for next call
 persistent old_grad_phi;  %Old gradient
-persistent old_grad_band; %Old gradient band
+%persistent old_grad_band; %Old gradient band
 persistent lr;           %Individual learning rates
 
 if(first_time)
    %rand('twister',sum(100*clock));
    old_grad_phi  = zeros(size(ls));
-   old_grad_band = ls.band; 
+   %old_grad_band = ls.band; 
    lr           = zeros(size(ls)) + LR_MAX;
    lr(ls.band)  = LR_0;
    %lr           = rand(size(ls))*LR_0 + 2 * LR_0;
@@ -61,7 +61,7 @@ ls = reinitialize(ls);
 % Compute the current gradient and extend values to the entire grid (if we
 % have a narrowband)
 %tmpi_band = intersect(ls.band, old_band);
-tmpu_band = union(ls.band, old_band);
+%tmpu_band = union(ls.band, old_band);
 
 %[Y, X] = ind2sub(size(ls), common_band);
 %curr_grad_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
@@ -89,7 +89,7 @@ ls.phi = old_phi + delta_phi;
 ls = reinitialize(ls);
 
 %The sign we really took
-union_band = union(ls.band, old_band);
+%union_band = union(ls.band, old_band);
 real_grad_phi = ls.phi - old_phi;
 %figure(100); hold off; clf;
 %imagesc(real_grad_phi);colorbar;hold on; plot(ls, 'contour y');
@@ -100,7 +100,7 @@ real_grad_phi = ls.phi - old_phi;
 
 eff_grad_phi = real_grad_phi;
 
-union_time_band = union(union_band, old_grad_band);
+%union_time_band = union(union_band, old_grad_band);
 
 %RPROP
 grad_sprod = sign(old_grad_phi .* eff_grad_phi);
@@ -116,7 +116,7 @@ lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
 
 %delta_phi(dec_i) = 0; %In original RPROP, do not perform update if sign change
 old_grad_phi  = eff_grad_phi;
-old_grad_band = union_band;
+%old_grad_band = union_band;
 %old_grad_phi(dec_i) = 0; %In original RPROP, do not adapt lr in next iteration if sign change.
 
 
