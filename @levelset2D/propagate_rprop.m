@@ -12,7 +12,7 @@ if(first_time)
    %rand('twister',sum(100*clock));
    old_grad_phi  = zeros(size(ls));
    %old_grad_band = ls.band; 
-   lr           = zeros(size(ls)) + LR_MAX;
+   lr           = zeros(size(ls)) + LR_0;
    lr(ls.band)  = LR_0;
    %lr           = rand(size(ls))*LR_0 + 2 * LR_0;
 end
