@@ -53,7 +53,7 @@ else
     end    
 end
 
-iterations
+%iterations
 
 % Rebuild the distance function and the narrowband
 ls = reinitialize(ls);
