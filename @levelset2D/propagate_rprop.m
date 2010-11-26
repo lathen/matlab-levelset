@@ -10,7 +10,8 @@ persistent lr;           %Individual learning rates
 
 
 
-%figure(44);imagesc(lr);colorbar;pause
+figure(44);imagesc(lr);colorbar; pause
+%figure(45);imagesc(ls.phi);colorbar;
 if(first_time)
    %rand('twister',sum(100*clock));
    old_grad_phi  = zeros(size(ls));
@@ -80,10 +81,13 @@ ls.band   = old_band;
 
 delta_phi = lr .* sign(curr_grad_phi);
 
+
 % Cut the rate of change so we don't move too fast
 %delta_phi(delta_phi > top) = top;
 %delta_phi(delta_phi < (-top)) = -top;
 delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
+%ind = abs(delta_phi) < abs(curr_grad_phi);
+%delta_phi(ind) = curr_grad_phi(ind);
 
 % Update level set function and reinitialize
 %ls.phi(tmpu_band) = old_phi(tmpu_band) + delta_phi;
@@ -102,6 +106,8 @@ real_grad_phi = ls.phi - old_phi;
 %imagesc(sign_disagrees);colorbar;hold on; plot(ls, 'contour y');
 
 eff_grad_phi = real_grad_phi;
+%eff_grad_phi(abs(ls.phi) <=2) = curr_grad_phi(abs(ls.phi) <=2);
+%eff_grad_phi = curr_grad_phi;
 
 %union_time_band = union(union_band, old_grad_band);
 
@@ -118,10 +124,16 @@ dec_i  = (grad_sprod < 0) & ...
    ((ls.phi > 0 & eff_grad_phi > 0) | ...
    (ls.phi < 0 & eff_grad_phi < 0));
 
+dec_i_far = dec_i & (abs(ls.phi) > 2);
+
 %figure(46);imagesc(grad_sprod);colorbar;
 %figure(48);imagesc(eff_grad_phi);colorbar;
+%figure(49);imagesc(curr_grad_phi);colorbar;
 lr(acc_i)  = min(lr(acc_i)  * acc_factor, LR_MAX);
 lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
+lr(dec_i_far)  = max(lr(dec_i_far), min(abs(ls.phi(dec_i_far))/2, LR_0));
+
+%lr((abs(ls.phi) <=1) & (lr == LR_MIN)) = 1;
 %lr(dec_i)  = max(abs(eff_grad_phi(dec_i))  , LR_MIN);
 %lr(null_i) = max(lr(null_i) * dec_factor, LR_MIN);
 %lr(sign_disagrees) = 2;
