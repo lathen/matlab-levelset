@@ -9,7 +9,8 @@ persistent old_grad_phi;  %Old gradient
 persistent lr;           %Individual learning rates
 
 
-figure(44);imagesc(lr);colorbar;pause
+
+%figure(44);imagesc(lr);colorbar;pause
 if(first_time)
    %rand('twister',sum(100*clock));
    old_grad_phi  = zeros(size(ls));
@@ -107,17 +108,27 @@ eff_grad_phi = real_grad_phi;
 %RPROP
 grad_sprod = sign(old_grad_phi .* eff_grad_phi);
 
-acc_i  = grad_sprod > 0;
 %null_i = grad_sprod == 0;
-dec_i  = grad_sprod < 0;
+%acc_i  = grad_sprod > 0;
+%dec_i  = grad_sprod < 0;
+acc_i  = (grad_sprod > 0) & ...
+   ((ls.phi > 0 & eff_grad_phi < 0) | ...
+   (ls.phi < 0 & eff_grad_phi > 0));
+dec_i  = (grad_sprod < 0) & ...
+   ((ls.phi > 0 & eff_grad_phi > 0) | ...
+   (ls.phi < 0 & eff_grad_phi < 0));
 
+%figure(46);imagesc(grad_sprod);colorbar;
+%figure(48);imagesc(eff_grad_phi);colorbar;
 lr(acc_i)  = min(lr(acc_i)  * acc_factor, LR_MAX);
 lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
+%lr(dec_i)  = max(abs(eff_grad_phi(dec_i))  , LR_MIN);
 %lr(null_i) = max(lr(null_i) * dec_factor, LR_MIN);
 %lr(sign_disagrees) = 2;
 
 %delta_phi(dec_i) = 0; %In original RPROP, do not perform update if sign change
 %ls.phi(dec_i) = old_phi(dec_i);
+%ls = reinitialize(ls);
 
 old_grad_phi  = eff_grad_phi;
 %old_grad_band = union_band;
