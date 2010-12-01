@@ -10,7 +10,7 @@ persistent lr;           %Individual learning rates
 
 
 
-%figure(44);imagesc(lr);colorbar; pause
+%figure(44);imagesc(lr);colorbar;
 %figure(45);imagesc(ls.phi);colorbar;
 if(first_time)
    %rand('twister',sum(100*clock));
@@ -131,7 +131,7 @@ dec_i_far = dec_i & (abs(ls.phi) > 1.5);
 %figure(49);imagesc(curr_grad_phi);colorbar;
 lr(acc_i)  = min(lr(acc_i)  * acc_factor, LR_MAX);
 lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
-lr(dec_i_far)  = max(lr(dec_i_far), min(abs(ls.phi(dec_i_far))/2.0, LR_0));
+lr(dec_i_far)  = max(lr(dec_i_far), min(abs(ls.phi(dec_i_far))/4.0, LR_0));
 
 %lr((abs(ls.phi) <=1) & (lr == LR_MIN)) = 1;
 %lr(dec_i)  = max(abs(eff_grad_phi(dec_i))  , LR_MIN);
