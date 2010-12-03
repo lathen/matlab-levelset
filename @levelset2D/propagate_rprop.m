@@ -124,7 +124,7 @@ dec_i  = (grad_sprod < 0) & ...
    ((ls.phi > 0 & eff_grad_phi > 0) | ...
    (ls.phi < 0 & eff_grad_phi < 0));
 
-dec_i_far = dec_i & (abs(ls.phi) > 1.5);
+dec_i_far = dec_i & (abs(ls.phi) > 2.0);
 
 %figure(46);imagesc(grad_sprod);colorbar;
 %figure(48);imagesc(eff_grad_phi);colorbar;
@@ -132,6 +132,7 @@ dec_i_far = dec_i & (abs(ls.phi) > 1.5);
 lr(acc_i)  = min(lr(acc_i)  * acc_factor, LR_MAX);
 lr(dec_i)  = max(lr(dec_i)  * dec_factor, LR_MIN);
 lr(dec_i_far)  = max(lr(dec_i_far), min(abs(ls.phi(dec_i_far))/4.0, LR_0));
+%lr(dec_i_far)  = max(lr(dec_i_far), min(0.1, LR_0));
 
 %lr((abs(ls.phi) <=1) & (lr == LR_MIN)) = 1;
 %lr(dec_i)  = max(abs(eff_grad_phi(dec_i))  , LR_MIN);
