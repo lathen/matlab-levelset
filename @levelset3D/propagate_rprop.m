@@ -74,7 +74,7 @@ ls = reinitialize(ls);
 %curr_grad_phi = ls.phi(tmpu_band) - old_phi(tmpu_band);
 ind = intersect(narrowband(ls),old_band);
 curr_grad_phi = zero_field;
-curr_grad_phi(ind) = ls(ind) - old_phi(ind);
+curr_grad_phi(ind) = ls.phi(ind) - old_phi(ind);
 %curr_grad_phi = ls.phi - dummy;
 
 %Only use the above to calculate the gradient
@@ -103,7 +103,7 @@ ls = reinitialize(ls);
 %union_band = union(ls.band, old_band);
 ind = intersect(narrowband(ls),old_band);
 real_grad_phi = zero_field;
-real_grad_phi(ind) = ls(ind) - old_phi(ind);
+real_grad_phi(ind) = ls.phi(ind) - old_phi(ind);
 %figure(100); hold off; clf;
 %imagesc(real_grad_phi);colorbar;hold on; plot(ls, 'contour y');
 
