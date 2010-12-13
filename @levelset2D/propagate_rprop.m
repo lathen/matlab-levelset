@@ -5,6 +5,7 @@ dec_factor = 0.5; %Constant
 
 % Set some persistent variables to store momentum for next call
 persistent old_grad_phi;  %Old gradient
+persistent zero_field;
 %persistent old_grad_band; %Old gradient band
 persistent lr;           %Individual learning rates
 
@@ -14,9 +15,10 @@ persistent lr;           %Individual learning rates
 %figure(45);imagesc(ls.phi);colorbar;
 if(first_time)
    %rand('twister',sum(100*clock));
-   old_grad_phi  = zeros(size(ls));
+   zero_field =  zeros(size(ls));
+   old_grad_phi  = zero_field;
    %old_grad_band = ls.band; 
-   lr           = zeros(size(ls)) + LR_0;
+   lr           = zero_field + LR_0;
    lr(ls.band)  = LR_0;
    %lr           = rand(size(ls))*LR_0 + 2 * LR_0;
 end
@@ -26,8 +28,8 @@ elapsed = 0;
 iterations = 0;
 
 % Save current level set phi and level set band
-old_phi  = ls.phi;
-old_band = ls.band;
+old_phi  = field(ls);
+old_band = narrowband(ls);
 %old_D    = bwdist(old_phi <= 0) - bwdist(old_phi >= 0);
 %figure;imagesc(old_D);pause
 %figure(44);imagesc(lr);colorbar;
@@ -70,7 +72,9 @@ ls = reinitialize(ls);
 %[Y, X] = ind2sub(size(ls), common_band);
 %curr_grad_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
 %curr_grad_phi = ls.phi(tmpu_band) - old_phi(tmpu_band);
-curr_grad_phi = ls.phi - old_phi;
+ind = intersect(narrowband(ls),old_band);
+curr_grad_phi = zero_field;
+curr_grad_phi(ind) = ls(ind) - old_phi(ind);
 %curr_grad_phi = ls.phi - dummy;
 
 %Only use the above to calculate the gradient
@@ -97,7 +101,9 @@ ls = reinitialize(ls);
 
 %The sign we really took
 %union_band = union(ls.band, old_band);
-real_grad_phi = ls.phi - old_phi;
+ind = intersect(narrowband(ls),old_band);
+real_grad_phi = zero_field;
+real_grad_phi(ind) = ls(ind) - old_phi(ind);
 %figure(100); hold off; clf;
 %imagesc(real_grad_phi);colorbar;hold on; plot(ls, 'contour y');
 
@@ -157,5 +163,5 @@ old_grad_phi(dec_i) = 0; %In original RPROP, do not adapt lr in next iteration i
 %subplot(4,2,4);imagesc(delta_phi);colorbar;hold on; plot(ls, 'contour y');
 %subplot(4,2,5);imagesc(grad_sprod);colorbar;hold on; plot(ls, 'contour y');
 %subplot(4,2,6);imagesc(ls.phi);colorbar;hold on; plot(ls, 'contour y');
-drawnow;
+%drawnow;
 %pause;
