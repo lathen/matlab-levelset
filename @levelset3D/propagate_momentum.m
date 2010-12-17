@@ -21,7 +21,7 @@ function [ls,iterations,elapsed] = propagate_momentum(ls, time, omega, eta, top,
 %   http://dmforge.itn.liu.se/ssvm09/
 %   This strategy is mainly used for segmentation applications.
 
-%   Author: Gunnar Läthén (gunnar.lathen@itn.liu.se)
+%   Author: Gunnar Lï¿½thï¿½n (gunnar.lathen@itn.liu.se)
 %   $Date: 2008/10/01
 
 
@@ -85,16 +85,19 @@ grad = (ls.phi(domain) - phi_previous(domain)) /  elapsed;
 %pause;
 
 % The domain of previous and current steps are different (since the
-% narrowband has moved). To fix this, first compute the distance transform
-% of the previous domain (this is only required in domain_diff, but we use
-% the convenience of built-in bwdist) 
+% narrowband has moved). To fix this, find the nearest neighbour
 domain_diff = setdiff(domain, domain_previous);
-BW = false(size(ls));
-BW(domain_previous) = true;
-[D,L] = bwdist(BW);
+
+[rid,cid] = ind2sub(size(ls.phi),domain_diff);
+[rip,cip] = ind2sub(size(ls.phi),domain_previous);
+[D,I] = pdist2(single([rip' cip']),single([rid' cid']),'euclidean','Smallest',1);
+
+%BW = false(size(ls));
+%BW(domain_previous) = true;
+%[D,L] = bwdist(BW);
 
 % Then, extend the previous step by picking the closest values
-step_previous(domain_diff) = step_previous(L(domain_diff));
+step_previous(domain_diff) = step_previous(domain_previous(I));
 
 % Compute the step, incorporating momentum and the previous step
 step = eta*(1-omega)*grad + omega*step_previous(domain);

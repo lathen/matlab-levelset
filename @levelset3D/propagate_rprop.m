@@ -123,12 +123,14 @@ grad_sprod = sign(old_grad_phi .* eff_grad_phi);
 %null_i = grad_sprod == 0;
 %acc_i  = grad_sprod > 0;
 %dec_i  = grad_sprod < 0;
-acc_i  = (grad_sprod > 0) & ...
-   ((ls.phi > 0 & eff_grad_phi < 0) | ...
-   (ls.phi < 0 & eff_grad_phi > 0));
-dec_i  = (grad_sprod < 0) & ...
-   ((ls.phi > 0 & eff_grad_phi > 0) | ...
-   (ls.phi < 0 & eff_grad_phi < 0));
+sprod = sign(ls.phi .* eff_grad_phi);
+
+acc_i  = (grad_sprod > 0) & (sprod < 0);
+   %((ls.phi > 0 & eff_grad_phi < 0) | ...
+   %(ls.phi < 0 & eff_grad_phi > 0));
+dec_i  = (grad_sprod < 0) & (sprod > 0);
+   %((ls.phi > 0 & eff_grad_phi > 0) | ...
+   %(ls.phi < 0 & eff_grad_phi < 0));
 
 dec_i_far = dec_i & (abs(ls.phi) > 2.0);
 
