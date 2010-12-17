@@ -88,9 +88,9 @@ grad = (ls.phi(domain) - phi_previous(domain)) /  elapsed;
 % narrowband has moved). To fix this, find the nearest neighbour
 domain_diff = setdiff(domain, domain_previous);
 
-[rid,cid] = ind2sub(size(ls.phi),domain_diff);
-[rip,cip] = ind2sub(size(ls.phi),domain_previous);
-[D,I] = pdist2(single([rip' cip']),single([rid' cid']),'euclidean','Smallest',1);
+[rid,cid,sid] = ind2sub(size(ls.phi),domain_diff);
+[rip,cip,sip] = ind2sub(size(ls.phi),domain_previous);
+[D,I] = pdist2(single([rip' cip' sip']),single([rid' cid' sid']),'euclidean','Smallest',1);
 
 %BW = false(size(ls));
 %BW(domain_previous) = true;
