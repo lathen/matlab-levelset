@@ -8,8 +8,8 @@
 % Create four circles to initialize the zero level set
 [X,Y] = meshgrid(-50:50, -40:40);
 phi = sqrt(X.^2 + Y.^2);
-phi(phi > 25) = 25;
-phi(phi < 24) = 24;
+%phi(phi > 25) = 25;
+%phi(phi < 24) = 24;
 phi = phi - 24.5;
 phi = repmat(phi, 2,2);
 

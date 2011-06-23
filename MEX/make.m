@@ -20,6 +20,9 @@ mex -I./include -outdir ../@levelset2D/private/ ../@levelset2D/private/reinitial
 disp('Compiling @levelset2D/private/reinitialize_fastsweeping.cpp');
 mex -I./include -outdir ../@levelset2D/private/ ../@levelset2D/private/reinitialize_fastsweeping.cpp 
 
+disp('Compiling @levelset2D/private/curvature.cpp');
+mex -I./include -outdir ../@levelset2D/private/ ../@levelset2D/private/curvature.cpp 
+
 
 % Build levelset3D
 disp('Building levelset3D');

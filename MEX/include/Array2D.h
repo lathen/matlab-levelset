@@ -87,6 +87,7 @@ public :
     
     inline mwSize getRows() const { return mRows; }
     inline mwSize getCols() const { return mCols; }
+	inline IndexType getElements() const { return mElements; }
     
     inline DataType & operator[](IndexType ind) const {
         mxAssert(ind < mElements, "Out of bounds in 2D-array");
