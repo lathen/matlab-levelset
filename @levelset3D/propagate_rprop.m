@@ -6,116 +6,46 @@ dec_factor = 0.5; %Constant
 % Set some persistent variables to store momentum for next call
 persistent old_grad_phi;  %Old gradient
 persistent zero_field;
-%persistent old_grad_band; %Old gradient band
+persistent old_grad_band; %Old gradient band
 persistent lr;           %Individual learning rates
 
-
-
-%figure(44);imagesc(lr);colorbar;
-%figure(45);imagesc(ls.phi);colorbar;
-if(first_time)
-   %rand('twister',sum(100*clock));
-   zero_field =  zeros(size(ls));
-   old_grad_phi  = zero_field;
-   %old_grad_band = ls.band; 
+if(isempty(zero_field) || first_time)
+   zero_field   = zeros(size(ls));
+   old_grad_phi = zero_field;
+   old_grad_band = ls.band; 
    lr           = zero_field + LR_0;
    lr(ls.band)  = LR_0;
-   %lr           = rand(size(ls))*LR_0 + 2 * LR_0;
 end
 
-% Start counters
-elapsed = 0;
-iterations = 0;
 
 % Save current level set phi and level set band
 old_phi  = field(ls);
 old_band = narrowband(ls);
-%old_D    = bwdist(old_phi <= 0) - bwdist(old_phi >= 0);
-%figure;imagesc(old_D);pause
-%figure(44);imagesc(lr);colorbar;
-%figure(45);imagesc(old_phi);colorbar;
-% Do one iteration if the requested time is 0
-if (time == 0)
-    
-    % Propagate the level set function in time
-    [phi,dt] = ls.integrate(ls, Inf, operator, varargin{:});
-    
-    % Update level set function and exit
-    ls.phi(ls.band) = phi;
-    elapsed = dt;
-    iterations = 1;
 
-% Else, iterate until requested time is reached
-else
-    while (elapsed < time)
+[curr_grad_phi, iterations, elapsed] = ls_calcgrad(ls, time, operator, varargin{:});
 
-        % Propagate the level set function in time
-        [phi,dt] = ls.integrate(ls, time-elapsed, operator, varargin{:});
-
-        % Update level set function and continue
-        ls.phi(ls.band) = phi;
-        elapsed = elapsed + dt;
-        iterations = iterations + 1;
-    end    
-end
-
-%iterations
-
-% Rebuild the distance function and the narrowband
-ls = reinitialize(ls);
-
-% Compute the current gradient and extend values to the entire grid (if we
-% have a narrowband)
-%tmpi_band = intersect(ls.band, old_band);
-%tmpu_band = union(ls.band, old_band);
-
-%[Y, X] = ind2sub(size(ls), common_band);
-%curr_grad_phi = griddata(double(X),double(Y),ls.phi(common_band) - old_phi(common_band),XI,YI,'nearest');
-%curr_grad_phi = ls.phi(tmpu_band) - old_phi(tmpu_band);
-ind = intersect(narrowband(ls),old_band);
-curr_grad_phi = zero_field;
-curr_grad_phi(ind) = ls.phi(ind) - old_phi(ind);
-%curr_grad_phi = ls.phi - dummy;
-
-%Only use the above to calculate the gradient
-%temp_phi  = ls.phi;
-%temp_band = ls.band;
-ls.phi    = old_phi;
-ls.band   = old_band;
-
-delta_phi = lr .* sign(curr_grad_phi);
+delta_phi = lr(ls.band) .* sign(curr_grad_phi(ls.band));
 
 
 % Cut the rate of change so we don't move too fast
-%delta_phi(delta_phi > top) = top;
-%delta_phi(delta_phi < (-top)) = -top;
-delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
-%ind = abs(delta_phi) < abs(curr_grad_phi);
-%delta_phi(ind) = curr_grad_phi(ind);
+delta_phi = min(delta_phi,top);
+%delta_phi = 2*top ./ (1 + exp(-2*delta_phi/top)) - top;
 
 % Update level set function and reinitialize
-%ls.phi(tmpu_band) = old_phi(tmpu_band) + delta_phi;
-ls.phi = old_phi + delta_phi;
+ls.phi(ls.band) = old_phi(ls.band) + delta_phi;
 
 ls = reinitialize(ls);
 
 %The sign we really took
-%union_band = union(ls.band, old_band);
 ind = intersect(narrowband(ls),old_band);
-real_grad_phi = zero_field;
-real_grad_phi(ind) = ls.phi(ind) - old_phi(ind);
-%figure(100); hold off; clf;
-%imagesc(real_grad_phi);colorbar;hold on; plot(ls, 'contour y');
+eff_grad_phi = zero_field;
+eff_grad_phi(ind) = ls.phi(ind) - old_phi(ind);
 
-%sign_disagrees = sign(curr_grad_phi) ~= sign(real_grad_phi);
-%figure(102); hold off; clf;
-%imagesc(sign_disagrees);colorbar;hold on; plot(ls, 'contour y');
 
-eff_grad_phi = real_grad_phi;
-%eff_grad_phi(abs(ls.phi) <=2) = curr_grad_phi(abs(ls.phi) <=2);
-%eff_grad_phi = curr_grad_phi;
+%Expand old_grad_phi to common domain
 
-%union_time_band = union(union_band, old_grad_band);
+
+
 
 %RPROP
 grad_sprod = sign(old_grad_phi .* eff_grad_phi);

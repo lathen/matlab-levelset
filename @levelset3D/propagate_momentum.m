@@ -1,4 +1,4 @@
-function [ls,iterations,elapsed] = propagate_momentum(ls, time, omega, eta, top, operator, varargin)
+function [ls,iterations,elapsed] = propagate_momentum(ls, time, omega, eta, top, first_time, operator, varargin)
 %PROPAGATE_MOMENTUM  Propagate a levelset3D object a given amount of time
 %                    using a momentum approach.
 %   [LS,iterations,elapsed] = PROPAGATE_MOMENTUM(LS, time, omage, eta, top,
@@ -24,65 +24,22 @@ function [ls,iterations,elapsed] = propagate_momentum(ls, time, omega, eta, top,
 %   Author: Gunnar L�th�n (gunnar.lathen@itn.liu.se)
 %   $Date: 2008/10/01
 
+'propage_momentum_3d'
 
 % Set some persistent variables to store momentum for next call
 persistent step_previous;
 persistent domain_previous;
-if isempty(step_previous)
+if isempty(step_previous || first_time)
     step_previous = zeros(size(ls));
     domain_previous = 1:numel(ls);
 end
 
-% Start counters
-elapsed = 0;
-iterations = 0;
 
 % Save previous level set function and narrowband
 phi_previous  = ls.phi;
-band_previous = ls.band;
+domain        = ls.band;
 
-% Do one iteration if the requested time is 0
-if (time == 0)
-    
-    % Propagate the level set function in time
-    [phi,dt] = ls.integrate(ls, Inf, operator, varargin{:});
-    
-    % Update level set function and exit
-    ls.phi(ls.band) = phi;
-    elapsed = dt;
-    iterations = 1;
-
-% Else, iterate until requested time is reached
-else
-    while (elapsed < time)
-
-        % Propagate the level set function in time
-        [phi,dt] = ls.integrate(ls, time-elapsed, operator, varargin{:});
-
-        % Update level set function and continue
-        ls.phi(ls.band) = phi;
-        elapsed = elapsed + dt;
-        iterations = iterations + 1;
-    end    
-end
-
-% Rebuild the distance function and the narrowband
-ls = reinitialize(ls);
-
-% Compute the current (approximate) gradient in the common domain,
-% given current and previous time instances
-domain = intersect(ls.band, band_previous);
-grad = (ls.phi(domain) - phi_previous(domain)) /  elapsed;
-
-%figure(43)
-%imagesc(ls.phi);
-%figure(44)
-%imagesc(ls.phi(ls.band));
-%figure(45)
-%imagesc(ls.phi(band_previous));
-%figure(46)
-%imagesc(ls.phi(domain));
-%pause;
+[grad, iterations, elapsed] = ls_calcgrad(ls, time, operator, varargin{:});
 
 % The domain of previous and current steps are different (since the
 % narrowband has moved). To fix this, find the nearest neighbour
@@ -92,23 +49,21 @@ domain_diff = setdiff(domain, domain_previous);
 [rip,cip,sip] = ind2sub(size(ls.phi),domain_previous);
 [D,I] = pdist2(single([rip' cip' sip']),single([rid' cid' sid']),'euclidean','Smallest',1);
 
-%BW = false(size(ls));
-%BW(domain_previous) = true;
-%[D,L] = bwdist(BW);
-
 % Then, extend the previous step by picking the closest values
 step_previous(domain_diff) = step_previous(domain_previous(I));
 
 % Compute the step, incorporating momentum and the previous step
-step = eta*(1-omega)*grad + omega*step_previous(domain);
+step = eta*(1-omega)*grad(domain) + omega*step_previous(domain);
 
 % Cut the rate of change so we don't move too fast
-step = 2*top ./ (1 + exp(-2*step/top)) - top;
-
-% Save the current step and domain for next iteration
-step_previous(domain) = step;
-domain_previous = domain;
+step = min(step,top);
+%step = 2*top ./ (1 + exp(-2*step/top)) - top;
 
 % Update level set function and reinitialize
-ls.phi(domain) = phi_previous(domain) + elapsed*step;
+ls.phi(domain) = phi_previous(domain) + step;
 ls = reinitialize(ls);
+
+% Save the current step and domain for next iteration
+step_previous(domain) = ls.phi(domain) - phi_previous(domain);
+domain_previous = domain;
+

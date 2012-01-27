@@ -1,5 +1,7 @@
 function [ls, iterations, elapsed] = propagate_rprop(ls, time, LR_MAX, LR_MIN, LR_0, top, first_time, operator, varargin)
 
+'propage_rprop_2d'
+
 acc_factor = 1.2; %Constant
 dec_factor = 0.5; %Constant
 

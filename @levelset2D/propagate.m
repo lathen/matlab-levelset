@@ -19,6 +19,8 @@ function [ls,iterations,elapsed] = propagate(ls, time, operator, varargin)
 %   $Date: 2007/10/17
 
 
+'propage_2d'
+
 % Start some counters
 elapsed = 0;
 iterations = 0;
