@@ -41,27 +41,18 @@ domain        = ls.band;
 
 % The domain of previous and current steps are different (since the
 % narrowband has moved). To fix this, find the nearest neighbour
-domain_diff = setdiff(domain, domain_previous);
-
-[rid,cid,sid] = ind2sub(size(ls.phi),domain_diff);
-[rip,cip,sip] = ind2sub(size(ls.phi),domain_previous);
-[D,I] = pdist2(single([rip' cip' sip']),single([rid' cid' sid']),'euclidean','Smallest',1);
-
-% Then, extend the previous step by picking the closest values
-step_previous(domain_diff) = step_previous(domain_previous(I));
+step_previous = ls_expandfield2d(step_previous, domain_previous, domain);
 
 % Compute the step, incorporating momentum and the previous step
 step = eta*(1-omega)*grad(domain) + omega*step_previous(domain);
 
 % Cut the rate of change so we don't move too fast
 step = min(step,top);
-%step = 2*top ./ (1 + exp(-2*step/top)) - top;
 
 % Update level set function and reinitialize
 ls.phi(domain) = phi_previous(domain) + step;
 ls = reinitialize(ls);
 
 % Save the current step and domain for next iteration
-step_previous(domain) = ls.phi(domain) - phi_previous(domain);
+step_previous = ls_calceffgrad(ls, phi_previous, domain, domain);
 domain_previous = domain;
-
