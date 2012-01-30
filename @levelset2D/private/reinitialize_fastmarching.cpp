@@ -78,7 +78,9 @@ DataType computeTentativeValue(int i, int j,
     
     // Case 2: We have accepted values along both dimensions
     DataType b = f1 + f2;
-    DataType root = b*b - 2*(f1*f1 + f2*f2 - 1);
+    //DataType root = b*b - 2*(f1*f1 + f2*f2 - 1);
+    DataType a = f1 - f2;
+    DataType root = 2 - a * a;
     if (root < 0)  root = 0;
     return (b + std::sqrt(root))*0.5;
 }
@@ -150,6 +152,9 @@ DataType interpolateDistance(const DataType & center,
                              const DataType & jm,
                              const DataType & jp)
 {
+  /* Approximate distance by linear interpolation along each
+     grid axis */
+  /*
     DataType b, val = std::numeric_limits<DataType>::max();
     if (im <= 0) {
         b = center / (center - im);
@@ -167,8 +172,31 @@ DataType interpolateDistance(const DataType & center,
         b = center / (center - jp);
         if (val > b) val = b;
     }
-    
     return val;    
+   */
+  
+  /* Improved distance estimate by Adalsteinsson and Sethian in
+     "The Fast Construction of Extension Velocities in Level Set Methods"
+     (see fig. 4) */
+  DataType s1 = std::numeric_limits<DataType>::max();
+  DataType s2 = std::numeric_limits<DataType>::max();
+  DataType t1 = std::numeric_limits<DataType>::max();
+  DataType t2 = std::numeric_limits<DataType>::max();
+  if (jm <= 0) s1 = center / (center - jm);
+  if (jp <= 0) s2 = center / (center - jp);
+  if (im <= 0) t1 = center / (center - im);
+  if (ip <= 0) t2 = center / (center - ip);
+
+  DataType s = std::min(s1,s2);
+  DataType t = std::min(t1,t2);
+  
+  if (s == std::numeric_limits<DataType>::max())
+    return t;
+  
+  if (t == std::numeric_limits<DataType>::max())
+    return s;
+  
+  return s*t/std::sqrt(s*s + t*t);
 }
 
 
@@ -192,6 +220,7 @@ void compute(mxArray * plhs[], const mxArray * prhs[])
 
     // Heap used to store and fetch smallest tentative grid points
     Heap<DataType> heap;
+    heap.reserve(indices.length());
 
     // Iterate the narrow band and find all points adjacent to
     // the zero-crossing

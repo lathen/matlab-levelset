@@ -15,6 +15,7 @@
 #include "Array2D.h"
 #include "IndexArray.h"
 #include <limits>
+#include <algorithm>
 
 template <typename DataType>
 DataType minAbs(DataType a, DataType b) {
@@ -57,25 +58,52 @@ DataType interpolateDistance(const DataType & center,
                              const DataType & jm,
                              const DataType & jp)
 {
-    DataType b, val = std::numeric_limits<DataType>::max();
-    if (im <= 0) {
-        b = center / (center - im);
-        if (val > b) val = b;
-    }
-    if (ip <= 0) {
-        b = center / (center - ip);
-        if (val > b) val = b;
-    }
-    if (jm <= 0) {
-        b = center / (center - jm);
-        if (val > b) val = b;
-    }
-    if (jp <= 0) {
-        b = center / (center - jp);
-        if (val > b) val = b;
-    }
-    
-    return val;    
+  /* Approximate distance by linear interpolation along each
+   grid axis */
+  
+   DataType b, val = std::numeric_limits<DataType>::max();
+   if (im <= 0) {
+   b = center / (center - im);
+   if (val > b) val = b;
+   }
+   if (ip <= 0) {
+   b = center / (center - ip);
+   if (val > b) val = b;
+   }
+   if (jm <= 0) {
+   b = center / (center - jm);
+   if (val > b) val = b;
+   }
+   if (jp <= 0) {
+   b = center / (center - jp);
+   if (val > b) val = b;
+   }
+   return val;    
+  
+  /* Improved distance estimate by Adalsteinsson and Sethian in
+   "The Fast Construction of Extension Velocities in Level Set Methods"
+   (see fig. 4) */
+  /*
+  DataType s1 = std::numeric_limits<DataType>::max();
+  DataType s2 = std::numeric_limits<DataType>::max();
+  DataType t1 = std::numeric_limits<DataType>::max();
+  DataType t2 = std::numeric_limits<DataType>::max();
+  if (jm <= 0) s1 = center / (center - jm);
+  if (jp <= 0) s2 = center / (center - jp);
+  if (im <= 0) t1 = center / (center - im);
+  if (ip <= 0) t2 = center / (center - ip);
+  
+  DataType s = std::min(s1,s2);
+  DataType t = std::min(t1,t2);
+  
+  if (s == std::numeric_limits<DataType>::max())
+    return t;
+  
+  if (t == std::numeric_limits<DataType>::max())
+    return s;
+  
+  return s*t/std::sqrt(s*s + t*t); 
+   */
 }
 
 
