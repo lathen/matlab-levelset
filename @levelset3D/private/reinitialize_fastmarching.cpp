@@ -93,7 +93,9 @@ DataType computeTentativeValue(int i, int j, int k,
     // Case 2: We have accepted values along two dimensions
     if (f3 == inf) {
         DataType b = f1 + f2;
-        DataType root = b*b - 2*(f1*f1 + f2*f2 - 1);
+        //DataType root = b*b - 2*(f1*f1 + f2*f2 - 1);
+        DataType a = f1 - f2;
+        DataType root = 2 - a * a;
         if (root < 0)  root = 0;
         return (b + std::sqrt(root))*0.5;
     }
@@ -229,6 +231,7 @@ void compute(mxArray * plhs[], const mxArray * prhs[])
 
     // Heap used to store and fetch smallest tentative grid points
     Heap<DataType> heap;
+    heap.reserve(indices.length());
 
     // Iterate the narrow band and find all points adjacent to
     // the zero-crossing
