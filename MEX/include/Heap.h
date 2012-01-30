@@ -49,6 +49,8 @@ public :
   Heapable * pop();
 
   Heapable * remove(Heapable * h);
+  
+  void reserve(unsigned int n);
 
   inline unsigned int size() { return mNodes.size()-1; }
 

@@ -39,6 +39,9 @@ mex -I./include -outdir ../@levelset3D/private/ ../@levelset3D/private/diff2_ord
 disp('Compiling @levelset3D/private/min_curvature.cpp');
 mex -I./include -outdir ../@levelset3D/private/ ../@levelset3D/private/min_curvature.cpp 
 
+disp('Compiling @levelset3D/private/principal_curvatures.cpp');
+mex -I./include -outdir ../@levelset3D/private/ ../@levelset3D/private/principal_curvatures.cpp 
+
 disp('Compiling @levelset3D/private/reinitialize_fastmarching.cpp');
 mex -I./include -outdir ../@levelset3D/private/ ../@levelset3D/private/reinitialize_fastmarching.cpp 
 

@@ -75,6 +75,13 @@ typename Heap<DataType>::Heapable * Heap<DataType>::remove(Heapable * h)
 
 
 template <typename DataType>
+void Heap<DataType>::reserve(unsigned int n)
+{
+  mNodes.reserve(n);
+}
+
+
+template <typename DataType>
 void Heap<DataType>::update(Heapable * h)
 {
   assert(h->position != (std::numeric_limits<unsigned int>::max)() && h->position < mNodes.size());
