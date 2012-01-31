@@ -20,8 +20,8 @@ mex -I./include -outdir ../@levelset2D/private/ ../@levelset2D/private/reinitial
 disp('Compiling @levelset2D/private/reinitialize_fastsweeping.cpp');
 mex -I./include -outdir ../@levelset2D/private/ ../@levelset2D/private/reinitialize_fastsweeping.cpp 
 
-disp('Compiling @levelset2D/private/curvature.cpp');
-mex -I./include -outdir ../@levelset2D/private/ ../@levelset2D/private/curvature.cpp 
+disp('Compiling @levelset2D/private/curvature_divergence_normals.cpp');
+mex -I./include -outdir ../@levelset2D/private/ ../@levelset2D/private/curvature_divergence_normals.cpp
 
 
 % Build levelset3D
