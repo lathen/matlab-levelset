@@ -35,6 +35,7 @@ ls.diff_central = @diff_central_order2;
 ls.diff_upwind = @diff_upwind_order1;
 ls.diff2 = @diff2_order2;
 ls.reinitialize = @reinitialize_fastsweeping_driver;
+ls.curvature = @curvature_simple;
 
 if nargin == 0
     ls = class(ls,'levelset2D');
@@ -90,5 +91,18 @@ else
         end
     end
 
+    if nargin >= 6
+        switch lower(varargin{6})
+            case 'simple'
+                % Do nothing, already set as standard
+            case 'gaussianderivatives'
+                ls.curvature = @curvature_gaussian_derivatives;
+            case 'divergencenormals'
+                ls.curvature = @curvature_divergence_normals_driver;
+            otherwise
+                error('Fifth argument is not a curvature estimation routine');
+        end
+    end
+    
     ls = class(ls,'levelset2D');
 end
