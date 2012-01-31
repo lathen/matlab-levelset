@@ -9,4 +9,4 @@ domain          = intersect(ls.band, old_band);
 effgrad         = zerofield;
 effgrad(domain) = (ls.phi(domain) - old_phi(domain));
 
-effgrad=ls_expandfield(effgrad, domain, expband);
+effgrad=ls_expandfield3d(effgrad, domain, expband);

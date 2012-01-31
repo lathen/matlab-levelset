@@ -33,8 +33,8 @@ ls = reinitialize(ls);
 
 expband      = union(union(old_band, old_grad_band),ls.band);
 eff_grad_phi = ls_calceffgrad(ls, old_phi, old_band, expband);
-expoldgrad   = ls_expandfield(old_grad_phi, old_grad_band, expband);
-expnewphi    = ls_expandfield(ls.phi, ls.band, expband);
+expoldgrad   = ls_expandfield3d(old_grad_phi, old_grad_band, expband);
+expnewphi    = ls_expandfield3d(ls.phi, ls.band, expband);
 
 %RPROP
 %-----
