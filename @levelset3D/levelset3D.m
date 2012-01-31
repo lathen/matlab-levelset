@@ -35,6 +35,7 @@ ls.diff_central = @diff_central_order2;
 ls.diff_upwind = @diff_upwind_order1;
 ls.diff2 = @diff2_order2;
 ls.reinitialize = @reinitialize_fastmarching_driver;
+ls.mean_curvature = @mean_curvature_simple;
 
 if nargin == 0
     ls = class(ls,'levelset3D');
@@ -86,5 +87,18 @@ else
         end
     end
 
+    if nargin >= 6
+        switch lower(varargin{6})
+            case 'simple'
+                % Do nothing, already set as standard
+            case 'gaussianderivatives'
+                ls.mean_curvature = @mean_curvature_gaussian_derivatives;
+            case 'principal'
+                ls.mean_curvature = @mean_curvature_principal;
+            otherwise
+                error('Sixth argument is not a valid curvature estimation routine');
+        end
+    end
+    
     ls = class(ls,'levelset3D');
 end
