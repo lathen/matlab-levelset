@@ -54,5 +54,6 @@ ls.phi(domain) = phi_previous(domain) + step;
 ls = reinitialize(ls);
 
 % Save the current step and domain for next iteration
+%step_previous(domain) = step;
 step_previous = ls_calceffgrad(ls, phi_previous, domain, domain);
 domain_previous = domain;

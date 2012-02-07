@@ -37,4 +37,4 @@ end
 ls = reinitialize(ls);
 
 grad = ls_calceffgrad(ls, phi_previous, band_previous,band_previous);
-grad = grad / elapsed;
+%grad = grad / elapsed;
