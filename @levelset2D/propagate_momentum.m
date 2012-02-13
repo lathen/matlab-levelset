@@ -44,7 +44,8 @@ domain        = ls.band;
 step_previous = ls_expandfield2d(step_previous, domain_previous, domain);
 
 % Compute the step, incorporating momentum and the previous step
-step = eta*(1-omega)*grad(domain) + omega*step_previous(domain);
+%step = eta*(1-omega)*grad(domain) + omega*step_previous(domain);
+step = eta*grad(domain) + omega*step_previous(domain);
 
 % Cut the rate of change so we don't move too fast
 step = min(step,top);
