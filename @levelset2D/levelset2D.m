@@ -100,7 +100,7 @@ else
             case 'divergencenormals'
                 ls.curvature = @curvature_divergence_normals_driver;
             otherwise
-                error('Fifth argument is not a curvature estimation routine');
+                error('Sixth argument is not a curvature estimation routine');
         end
     end
     
