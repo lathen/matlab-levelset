@@ -1,5 +1,5 @@
 function [ls,iterations,elapsed] = propagate_momentum(ls, time, omega, eta, top, first_time, operator, varargin)
-%PROPAGATE_MOMENTUM  Propagate a levelset2D object a given amount of time
+%PROPAGATE_MOMENTUM  Propagate a levelset3D object a given amount of time
 %                    using a momentum approach.
 %   [LS,iterations,elapsed] = PROPAGATE_MOMENTUM(LS, time, omage, eta, top,
 %   operator, ...) propagates LS a given amount of time using a level set
@@ -13,16 +13,13 @@ function [ls,iterations,elapsed] = propagate_momentum(ls, time, omega, eta, top,
 %   The operator function must adhere to the prototype:
 %     function [dphi_dt,dt] = levelsetPDE(LS, varargin)
 %   where dphi_dt is the evaluated level set PDE, dt is a stable time step
-%   for explicit time integration, LS is a levelset2D object and varargin
+%   for explicit time integration, LS is a levelset3D object and varargin
 %   specifies the parameters of the level set PDE.
 %
 %   The parameter omega specifies the momentum parameter, while eta
 %   specifies the step length as described in the paper at
 %   http://dmforge.itn.liu.se/ssvm09/
 %   This strategy is mainly used for segmentation applications.
-
-%   Author: Gunnar L�th�n (gunnar.lathen@itn.liu.se)
-%   $Date: 2008/10/01
 
 
 % Set some persistent variables to store momentum for next call
@@ -44,8 +41,7 @@ domain        = ls.band;
 step_previous = ls_expandfield3d(step_previous, domain_previous, domain);
 
 % Compute the step, incorporating momentum and the previous step
-%step = eta*(1-omega)*grad(domain) + omega*step_previous(domain);
-step = eta*grad(domain) + omega*step_previous(domain);
+step = eta*(1-omega)*grad(domain) + omega*step_previous(domain);
 
 % Cut the rate of change so we don't move too fast
 step = min(step,top);

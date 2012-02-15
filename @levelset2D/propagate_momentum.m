@@ -21,9 +21,6 @@ function [ls,iterations,elapsed] = propagate_momentum(ls, time, omega, eta, top,
 %   http://dmforge.itn.liu.se/ssvm09/
 %   This strategy is mainly used for segmentation applications.
 
-%   Author: Gunnar L�th�n (gunnar.lathen@itn.liu.se)
-%   $Date: 2008/10/01
-
 
 % Set some persistent variables to store momentum for next call
 persistent step_previous;
@@ -44,8 +41,7 @@ domain        = ls.band;
 step_previous = ls_expandfield2d(step_previous, domain_previous, domain);
 
 % Compute the step, incorporating momentum and the previous step
-%step = eta*(1-omega)*grad(domain) + omega*step_previous(domain);
-step = eta*grad(domain) + omega*step_previous(domain);
+step = eta*(1-omega)*grad(domain) + omega*step_previous(domain);
 
 % Cut the rate of change so we don't move too fast
 step = min(step,top);
