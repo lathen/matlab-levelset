@@ -19,7 +19,7 @@
 
 template <typename DataType>
 DataType minAbs(DataType a, DataType b) {
-    return std::abs(a) < std::abs(b) ? a : b;
+    return abs(a) < abs(b) ? a : b;
 }
 
 

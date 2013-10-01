@@ -21,5 +21,5 @@ __global__ void integrateEuler(
 	int ind = (baseZ*dim[1] + baseY)*dim[0] + baseX;
 
 	// Propagate
-	phi[ind] += dt*ddt[ind];
+    phi[ind] += dt*ddt[ind];
 }

@@ -10,8 +10,8 @@ dim = gpuArray(int32(size(phi)));
 % Do one iteration if the requested time is 0
 if (time == 0)
     
-    tic; dphidt = feval(operator, phi, dphidt, dim, varargin{:}); toc;
-    tic; phi = feval(integrator, phi, dphidt, dt, dim); toc;
+    dphidt = feval(operator, phi, dphidt, dim, varargin{:});
+    phi = feval(integrator, phi, dphidt, dt, dim);
 
     elapsed = dt;
     iterations = 1;
@@ -20,8 +20,8 @@ if (time == 0)
 else
     while (elapsed < time)
 
-        tic; dphidt = feval(operator, phi, dphidt, dim, varargin{:}); toc;
-        tic; phi = feval(integrator, phi, dphidt, dt, dim); toc;
+        dphidt = feval(operator, phi, dphidt, dim, varargin{:});
+        phi = feval(integrator, phi, dphidt, dt, dim);
 
         % Update level set function and continue
         elapsed = elapsed + dt;
